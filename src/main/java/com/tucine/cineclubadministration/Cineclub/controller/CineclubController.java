@@ -84,7 +84,13 @@ public class CineclubController {
         return new ResponseEntity<>(cineclubService.hideCineclub(cineclubId), org.springframework.http.HttpStatus.OK);
     }
 
-    
+    //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/cineclubs/{cineclubId}
+    //Method: PUT
+    @Transactional
+    @PutMapping("/cineclubs/{cineclubId}")
+    public ResponseEntity<CineclubDto> modifyCineclub(@PathVariable Long cineclubId, @RequestBody CineclubReceiveDto cineclubReceiveDto){
+        return new ResponseEntity<>(cineclubService.modifyCineclub(cineclubId, cineclubReceiveDto), org.springframework.http.HttpStatus.OK);
+    }
 
 
 

@@ -59,7 +59,58 @@ public class CineclubServiceImpl implements CineclubService {
 
     @Override
     public CineclubDto modifyCineclub(Long cineclubId, CineclubReceiveDto cineclubReceiveDto) {
-        return null;
+        Cineclub existingCineclub = cineclubRepository.findById(cineclubId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró un cineclub con el ID proporcionado"));
+
+        validateCineclub(cineclubReceiveDto);
+
+        // Verifica y actualiza los campos no vacíos en cineclubReceiveDto
+        if (cineclubReceiveDto.getName() != null && !cineclubReceiveDto.getName().isEmpty()) {
+            existingCineclub.setName(cineclubReceiveDto.getName());
+        }
+        if (cineclubReceiveDto.getCapacity() != null) {
+            existingCineclub.setCapacity(cineclubReceiveDto.getCapacity());
+        }
+        if (cineclubReceiveDto.getAddress() != null && !cineclubReceiveDto.getAddress().isEmpty()) {
+            existingCineclub.setAddress(cineclubReceiveDto.getAddress());
+        }
+        if (cineclubReceiveDto.getBannerSrc() != null && !cineclubReceiveDto.getBannerSrc().isEmpty()) {
+            existingCineclub.setBannerSrc(cineclubReceiveDto.getBannerSrc());
+        }
+        if (cineclubReceiveDto.getLogoSrc() != null && !cineclubReceiveDto.getLogoSrc().isEmpty()) {
+            existingCineclub.setLogoSrc(cineclubReceiveDto.getLogoSrc());
+        }
+        if (cineclubReceiveDto.getDescription() != null && !cineclubReceiveDto.getDescription().isEmpty()) {
+            existingCineclub.setDescription(cineclubReceiveDto.getDescription());
+        }
+        if (cineclubReceiveDto.getSocialReason() != null && !cineclubReceiveDto.getSocialReason().isEmpty()) {
+            existingCineclub.setSocialReason(cineclubReceiveDto.getSocialReason());
+        }
+        if (cineclubReceiveDto.getRUC() != null && !cineclubReceiveDto.getRUC().isEmpty()) {
+            existingCineclub.setRUC(cineclubReceiveDto.getRUC());
+        }
+        if (cineclubReceiveDto.getPhone() != null && !cineclubReceiveDto.getPhone().isEmpty()) {
+            existingCineclub.setPhone(cineclubReceiveDto.getPhone());
+        }
+        if (cineclubReceiveDto.getFilms() != null && !cineclubReceiveDto.getFilms().isEmpty()) {
+            existingCineclub.setFilms(cineclubReceiveDto.getFilms());
+        }
+        if (cineclubReceiveDto.getOpenInHours() != null && !cineclubReceiveDto.getOpenInHours().toString().isEmpty()) {
+            existingCineclub.setOpenInHours(cineclubReceiveDto.getOpenInHours());
+        }
+        if (cineclubReceiveDto.getCineclubType() != null) {
+            existingCineclub.setCineclubType(cineclubReceiveDto.getCineclubType());
+        }
+        if (cineclubReceiveDto.getState() != null) {
+            existingCineclub.setState(cineclubReceiveDto.getState());
+        }
+        if (cineclubReceiveDto.getDescription() != null && !cineclubReceiveDto.getDescription().isEmpty()) {
+            existingCineclub.setDescription(cineclubReceiveDto.getDescription());
+        }
+
+        Cineclub updatedCineclub = cineclubRepository.save(existingCineclub);
+
+        return EntityToDto(updatedCineclub);
     }
 
     @Override
