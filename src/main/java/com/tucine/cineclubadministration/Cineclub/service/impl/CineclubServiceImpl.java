@@ -26,7 +26,8 @@ public class CineclubServiceImpl implements CineclubService {
     private ModelMapper modelMapper;
     @Override
     public List<CineclubDto> getAllCineclubs() {
-        return null;
+        List<Cineclub> cineclubs = cineclubRepository.findAll();
+        return cineclubs.stream().map(this::EntityToDto).toList();
     }
 
     public CineclubDto EntityToDto(Cineclub cineclub){
@@ -72,12 +73,20 @@ public class CineclubServiceImpl implements CineclubService {
 
     @Override
     public CineclubDto getCineclubById(Long cineclubId) {
-        return null;
+        Cineclub cineclub = cineclubRepository.findById(cineclubId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró un cineclub con el ID proporcionado"));
+
+        return EntityToDto(cineclub);
     }
 
     @Override
     public CineclubDto getCineclubByName(String cineclubName) {
-        return null;
+        Cineclub cineclub = cineclubRepository.findByName(cineclubName);
+
+        if (cineclub == null) {
+            throw new IllegalArgumentException("No se encontró un cineclub con el nombre proporcionado");
+        }
+        return EntityToDto(cineclub);
     }
 
     private void validateCineclub(CineclubReceiveDto cineclubReceiveDto) {
