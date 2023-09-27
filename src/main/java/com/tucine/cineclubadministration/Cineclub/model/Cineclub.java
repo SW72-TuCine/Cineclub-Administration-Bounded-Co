@@ -45,6 +45,9 @@ public class Cineclub {
     private String description;
     @Column(name = "capacity", nullable = false, length = 11)
     private Integer capacity;
+    @Column(name = "owner_id")
+    private Long ownerId;
+
 
     @ManyToOne
     @JoinColumn(name = "cineclub_type_id", nullable = false,foreignKey = @ForeignKey(name = "FK_cineclub_cineclub_type"))
