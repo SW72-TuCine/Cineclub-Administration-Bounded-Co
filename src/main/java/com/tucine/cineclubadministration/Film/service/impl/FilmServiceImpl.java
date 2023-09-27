@@ -15,7 +15,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FilmServiceImpl implements FilmService {
@@ -90,7 +92,19 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public List<FilmDto> searchExistingFilm(String title) {
-        return null;
+        List<Film> filmsSearched = filmRepository.findByTitleContainingIgnoreCase(title);
+
+        // Si no se encuentran coincidencias, devolver una lista vacía
+        if (filmsSearched.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Mapear la lista de películas a una lista de FilmDto
+        List<FilmDto> filmDtos = filmsSearched.stream()
+                .map(film -> modelMapper.map(film, FilmDto.class))
+                .collect(Collectors.toList());
+
+        return filmDtos;
     }
 
     @Override
