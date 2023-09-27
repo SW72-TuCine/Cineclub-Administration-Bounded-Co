@@ -34,7 +34,14 @@ public class FilmController {
         FilmDto filmDto = filmService.getFilmById(filmId);
         return ResponseEntity.ok(filmDto);
     }
-    
+
+    //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/films/{category}
+    @Transactional(readOnly = true)
+    @GetMapping("/films/{category}")
+    public ResponseEntity<List<FilmDto>> getFilmsByCategory(@PathVariable("category") String category){
+        List<FilmDto> listFilmDto = filmService.getFilmsByCategory(category);
+        return ResponseEntity.ok(listFilmDto);
+    }
 
 
 }

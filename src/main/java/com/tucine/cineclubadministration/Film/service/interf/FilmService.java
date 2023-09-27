@@ -23,6 +23,8 @@ public interface FilmService{
     List<ExternalMovie> searchFilmInExternalApi(String title);
     List<FilmDto> searchExistingFilm(String title);
 
+    //Obtener películas por categoría
+    List<FilmDto> getFilmsByCategory(String category);
 
     //Añadir categorías a una película
     FilmDto addCategoriesToFilmByCategoriesIds(Long filmId, List<Long> categoriesIds);

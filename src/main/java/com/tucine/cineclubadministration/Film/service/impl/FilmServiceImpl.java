@@ -3,6 +3,7 @@ package com.tucine.cineclubadministration.Film.service.impl;
 import com.tucine.cineclubadministration.Cineclub.repository.CineclubRepository;
 import com.tucine.cineclubadministration.Film.dto.normal.*;
 import com.tucine.cineclubadministration.Film.dto.receive.FilmReceiveDto;
+import com.tucine.cineclubadministration.Film.model.Category;
 import com.tucine.cineclubadministration.Film.model.ExternalMovie;
 import com.tucine.cineclubadministration.Film.model.Film;
 import com.tucine.cineclubadministration.Film.repository.ActorRepository;
@@ -90,6 +91,25 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<FilmDto> searchExistingFilm(String title) {
         return null;
+    }
+
+    @Override
+    public List<FilmDto> getFilmsByCategory(String category) {
+
+        if(!categoryRepository.existsByName(category)){
+            throw new RuntimeException("No existe la categoría con el nombre: " + category);
+        }
+
+        List<Film> films = filmRepository.findAll();
+        //buscamos las categorías de cada película y filtramos las que contengan la categoría, como la categoría es un objeto
+        // del tipo Category, tenemos que hacer un map para obtener el nombre de la categoría y compararlo con el nombre de la categoría
+        // que nos pasan por parámetro
+        return films.stream()
+                .filter(film -> film.getCategories().stream()
+                        .map(Category::getName)
+                        .anyMatch(categoryName -> categoryName.equals(category)))
+                .map(this::EntityToDto)
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @Override
