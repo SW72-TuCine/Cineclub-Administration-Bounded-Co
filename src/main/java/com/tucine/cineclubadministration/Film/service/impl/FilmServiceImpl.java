@@ -119,6 +119,9 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public FilmDto getFilmById(Long filmId) {
-        return null;
+        Film film = filmRepository.findById(filmId)
+                .orElseThrow(() -> new RuntimeException("No se encontró la película con el ID: " + filmId));
+
+        return modelMapper.map(film, FilmDto.class);
     }
 }
