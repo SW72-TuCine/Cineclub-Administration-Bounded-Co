@@ -64,7 +64,10 @@ public class CineclubServiceImpl implements CineclubService {
 
     @Override
     public void deleteCineclub(Long cineclubId) {
+        Cineclub existingCineclub = cineclubRepository.findById(cineclubId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró un cineclub con el ID proporcionado"));
 
+        cineclubRepository.delete(existingCineclub);
     }
 
     @Override

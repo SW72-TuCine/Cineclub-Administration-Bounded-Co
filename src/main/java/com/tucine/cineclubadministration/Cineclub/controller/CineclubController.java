@@ -8,10 +8,7 @@ import com.tucine.cineclubadministration.Film.model.Film;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -61,6 +58,16 @@ public class CineclubController {
     public ResponseEntity<List<FilmDto>> getAllMoviesByCineclubId(Long cineclubId){
         return new ResponseEntity<>(cineclubService.getAllMoviesByCineclubId(cineclubId), org.springframework.http.HttpStatus.OK);
     }
+
+    //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/cineclubs/{cineclubId}
+    //Method: DELETE
+    @Transactional
+    @DeleteMapping("/cineclubs/{cineclubId}")
+    public ResponseEntity<Void> deleteCineclub(@PathVariable Long cineclubId){
+        cineclubService.deleteCineclub(cineclubId);
+        return new ResponseEntity<>(org.springframework.http.HttpStatus.NO_CONTENT);
+    }
+
 
 
 }
