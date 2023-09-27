@@ -107,6 +107,18 @@ public class CineclubServiceImpl implements CineclubService {
     }
 
     @Override
+    public CineclubDto hideCineclub(Long cineclubId) {
+
+            Cineclub cineclub = cineclubRepository.findById(cineclubId)
+                    .orElseThrow(() -> new IllegalArgumentException("No se encontró un cineclub con el ID proporcionado"));
+
+            if(!(cineclub.getState()=="Oculto"))
+                cineclub.setState("Oculto");
+
+            return EntityToDto(cineclubRepository.save(cineclub));
+    }
+
+    @Override
     public CineclubDto getCineclubById(Long cineclubId) {
         Cineclub cineclub = cineclubRepository.findById(cineclubId)
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró un cineclub con el ID proporcionado"));

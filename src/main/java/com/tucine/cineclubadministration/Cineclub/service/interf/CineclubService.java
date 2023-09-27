@@ -22,6 +22,8 @@ public interface CineclubService {
 
     CineclubDto suspendCineclub(Long cineclubId);
 
+    CineclubDto hideCineclub(Long cineclubId);
+
     CineclubDto getCineclubById(Long cineclubId);
 
     CineclubDto getCineclubByName(String cineclubName);
