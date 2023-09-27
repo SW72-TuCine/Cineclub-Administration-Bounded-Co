@@ -20,6 +20,8 @@ public interface CineclubService {
 
     CineclubDto removeMovieToCineclub(Long cineclubId, Long movieId);
 
+    CineclubDto suspendCineclub(Long cineclubId);
+
     CineclubDto getCineclubById(Long cineclubId);
 
     CineclubDto getCineclubByName(String cineclubName);

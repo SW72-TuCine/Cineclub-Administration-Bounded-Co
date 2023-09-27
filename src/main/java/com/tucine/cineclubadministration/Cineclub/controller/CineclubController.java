@@ -68,6 +68,16 @@ public class CineclubController {
         return new ResponseEntity<>(org.springframework.http.HttpStatus.NO_CONTENT);
     }
 
+    //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/cineclubs/{cineclubId}
+    //Method: PUT
+    @Transactional
+    @PutMapping("/cineclubs/{cineclubId}")
+    public ResponseEntity<CineclubDto> suspendCineclub(@PathVariable Long cineclubId){
+        return new ResponseEntity<>(cineclubService.suspendCineclub(cineclubId), org.springframework.http.HttpStatus.OK);
+    }
+
+
+
 
 
 }
