@@ -1,11 +1,10 @@
 package com.tucine.cineclubadministration.Film.service.impl;
 
+import com.tucine.cineclubadministration.Cineclub.model.Cineclub;
 import com.tucine.cineclubadministration.Cineclub.repository.CineclubRepository;
 import com.tucine.cineclubadministration.Film.dto.normal.*;
 import com.tucine.cineclubadministration.Film.dto.receive.FilmReceiveDto;
-import com.tucine.cineclubadministration.Film.model.Category;
-import com.tucine.cineclubadministration.Film.model.ExternalMovie;
-import com.tucine.cineclubadministration.Film.model.Film;
+import com.tucine.cineclubadministration.Film.model.*;
 import com.tucine.cineclubadministration.Film.repository.ActorRepository;
 import com.tucine.cineclubadministration.Film.repository.AwardRepository;
 import com.tucine.cineclubadministration.Film.repository.CategoryRepository;
@@ -74,22 +73,42 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public ContentRatingDto getContentRatingByFilmId(Long filmId) {
-        return null;
+        Film film = filmRepository.findById(filmId)
+                .orElseThrow(() -> new RuntimeException("No se encontró la película con el id: " + filmId));
+
+        return modelMapper.map(film.getContentRating(), ContentRatingDto.class);
     }
 
     @Override
     public List<CategoryDto> getAllCategoriesByFilmId(Long filmId) {
-        return null;
+
+        Film film =filmRepository.findById(filmId)
+                .orElseThrow(() -> new RuntimeException("No se encontró la película con el id: " + filmId));
+
+        return film.getCategories().stream()
+                .map(category -> modelMapper.map(category, CategoryDto.class))
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @Override
     public List<ActorDto> getAllActorsByFilmId(Long filmId) {
-        return null;
+
+        Film film = filmRepository.findById(filmId)
+                .orElseThrow(() -> new RuntimeException("No se encontró la película con el id: " + filmId));
+
+        return film.getActors().stream()
+                .map(actor -> modelMapper.map(actor, ActorDto.class))
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @Override
     public List<AwardDto> getAllAwardsByFilmId(Long filmId) {
-        return null;
+        Film film = filmRepository.findById(filmId)
+                .orElseThrow(() -> new RuntimeException("No se encontró la película con el id: " + filmId));
+
+        return film.getAwards().stream()
+                .map(award -> modelMapper.map(award, AwardDto.class))
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @Override
@@ -135,27 +154,104 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public FilmDto addCategoriesToFilmByCategoriesIds(Long filmId, List<Long> categoriesIds) {
-        return null;
+        // Verificar que la lista de categorías no esté vacía
+        if (categoriesIds.isEmpty()) {
+            throw new RuntimeException("La lista de categorías no puede estar vacía");
+        }
+        // Obtener la película por su ID (si no se encuentra, lanzará una excepción)
+        Film film = filmRepository.findById(filmId)
+                .orElseThrow(() -> new RuntimeException("No se encontró la película con el ID: " + filmId));
+
+        // Verificar la existencia de categorías y evitar duplicados
+        for (Long categoryId : categoriesIds) {
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new RuntimeException("No se encontró la categoría con el ID: " + categoryId));
+
+            if (!film.getCategories().contains(category)) {
+                film.getCategories().add(category);
+            }
+        }
+        // Guardar la película actualizada
+        film = filmRepository.save(film);
+
+        // Mapear y devolver la película actualizada
+        return modelMapper.map(film, FilmDto.class);
     }
 
     @Override
     public FilmDto addActorsToFilmByActorsIds(Long filmId, List<Long> actorsIds) {
-        return null;
+
+
+        if(actorsIds.isEmpty()){
+            throw new RuntimeException("La lista de actores no puede estar vacía");
+        }
+
+        Film film = filmRepository.findById(filmId)
+                .orElseThrow(() -> new RuntimeException("No se encontró la película con el ID: " + filmId));
+
+        for(Long actorId: actorsIds){
+            Actor actor = actorRepository.findById(actorId)
+                    .orElseThrow(() -> new RuntimeException("No se encontró el actor con el ID: " + actorId));
+
+            if(!film.getActors().contains(actor)){
+                film.getActors().add(actor);
+            }
+        }
+
+        film = filmRepository.save(film);
+
+        return modelMapper.map(film, FilmDto.class);
+
     }
 
     @Override
     public FilmDto addAwardsToFilmByAwardsIds(Long filmId, List<Long> awardsIds) {
-        return null;
+        if(awardsIds.isEmpty()){
+            throw new RuntimeException("La lista de premios no puede estar vacía");
+        }
+
+        Film film = filmRepository.findById(filmId)
+                .orElseThrow(() -> new RuntimeException("No se encontró la película con el ID: " + filmId));
+
+        for(Long awardId: awardsIds){
+            Award award = awardRepository.findById(awardId)
+                    .orElseThrow(() -> new RuntimeException("No se encontró el premio con el ID: " + awardId));
+
+            if(!film.getAwards().contains(award)){
+                film.getAwards().add(award);
+            }
+        }
+
+        film = filmRepository.save(film);
+
+        return modelMapper.map(film, FilmDto.class);
     }
 
     @Override
     public FilmDto addCineclubToFilmByCineclubId(Long filmId, Long cineclubId) {
-        return null;
+        Film film = filmRepository.findById(filmId)
+                .orElseThrow(() -> new RuntimeException("No se encontró la película con el ID: " + filmId));
+
+        Cineclub cineclub = cineclubRepository.findById(cineclubId)
+                .orElseThrow(() -> new RuntimeException("No se encontró el cineclub con el ID: " + cineclubId));
+
+        if(!film.getCineclubs().contains(cineclub)){
+            film.getCineclubs().add(cineclub);
+        }
+
+        film = filmRepository.save(film);
+
+        return modelMapper.map(film, FilmDto.class);
     }
 
     @Override
     public FilmDto getFilmByTitle(String title) {
-        return null;
+        Film film = filmRepository.findByTitle(title);
+        if(film == null){
+            throw new RuntimeException("No se encontró la película con el título: " + title);
+        }
+
+        return modelMapper.map(film, FilmDto.class);
     }
 
     @Override
