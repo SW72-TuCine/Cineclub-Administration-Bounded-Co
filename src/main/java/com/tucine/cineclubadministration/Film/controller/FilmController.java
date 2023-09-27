@@ -1,6 +1,7 @@
 package com.tucine.cineclubadministration.Film.controller;
 
 import com.tucine.cineclubadministration.Film.dto.normal.FilmDto;
+import com.tucine.cineclubadministration.Film.dto.receive.FilmReceiveDto;
 import com.tucine.cineclubadministration.Film.service.interf.FilmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -40,13 +41,23 @@ public class FilmController {
         return ResponseEntity.ok(listFilmDto);
     }
 
-    //URL: http://localhost:8080/api/TuCine/V1/cineclub_administration/films/search?title=blue
+    //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/films/search?title=blue
     @Transactional(readOnly = true)
     @GetMapping("/films/search")
     public ResponseEntity<List<FilmDto>> searchExistingFilm(@RequestParam("title") String title){
         List<FilmDto> films = filmService.searchExistingFilm(title);
         return ResponseEntity.ok(films);
     }
+
+    // URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/films
+    @Transactional
+    @PostMapping("/films")
+    public ResponseEntity<FilmDto> createFilm(@RequestBody FilmReceiveDto filmReceiveDto){
+        FilmDto filmDtoCreated = filmService.createNewFilm(filmReceiveDto);
+        return ResponseEntity.ok(filmDtoCreated);
+    }
+
+
 
 
 }

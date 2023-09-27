@@ -62,7 +62,14 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public FilmDto createNewFilm(FilmReceiveDto filmReceiveDto) {
-        return null;
+
+        validateFilm(filmReceiveDto);
+
+        FilmDto filmDto = modelMapper.map(filmReceiveDto, FilmDto.class);
+
+        Film film = DtoToEntity(filmDto);
+
+        return EntityToDto(filmRepository.save(film));
     }
 
     @Override
@@ -157,5 +164,33 @@ public class FilmServiceImpl implements FilmService {
                 .orElseThrow(() -> new RuntimeException("No se encontró la película con el ID: " + filmId));
 
         return modelMapper.map(film, FilmDto.class);
+    }
+
+
+    private void validateFilm(FilmReceiveDto filmReceiveDto) {
+        if(filmReceiveDto.getTitle() == null || filmReceiveDto.getTitle().isEmpty()){
+            throw new RuntimeException("El título de la película no puede estar vacío");
+        }
+        if(filmReceiveDto.getDuration() <= 0){
+            throw new RuntimeException("La duración de la película no puede ser menor o igual a 0");
+        }
+        if(filmReceiveDto.getSynopsis() == null || filmReceiveDto.getSynopsis().isEmpty()){
+            throw new RuntimeException("La sinopsis de la película no puede estar vacía");
+        }
+        if(filmReceiveDto.getPosterSrc() == null || filmReceiveDto.getPosterSrc().isEmpty()){
+            throw new RuntimeException("La ruta del poster de la película no puede estar vacía");
+        }
+/*        if(filmReceiveDto.getTrailerSrc() == null || filmReceiveDto.getTrailerSrc().isEmpty()){
+            throw new RuntimeException("La ruta del trailer de la película no puede estar vacía");
+        }*/
+/*        if(filmReceiveDto.getActors() == null || filmReceiveDto.getActors().isEmpty()){
+            throw new RuntimeException("La lista de actores de la película no puede estar vacía");
+        }*/
+/*        if(filmReceiveDto.getCategories() == null || filmReceiveDto.getCategories().isEmpty()){
+            throw new RuntimeException("La lista de categorías de la película no puede estar vacía");
+        }*/
+        if(filmReceiveDto.getContentRating() == null){
+            throw new RuntimeException("La clasificación de contenido de la película no puede estar vacía");
+        }
     }
 }
