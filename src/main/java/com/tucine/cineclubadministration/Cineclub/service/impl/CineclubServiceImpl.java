@@ -137,12 +137,42 @@ public class CineclubServiceImpl implements CineclubService {
 
     @Override
     public CineclubDto addMovieToCineclub(Long cineclubId, Long movieId) {
-        return null;
+
+        Cineclub existingCineclub = cineclubRepository.findById(cineclubId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró un cineclub con el ID proporcionado"));
+
+        // Buscar la película por su ID
+        Film existingFilm = filmRepository.findById(movieId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró una película con el ID proporcionado"));
+
+        // Agregar la película al cineclub
+        existingCineclub.getFilms().add(existingFilm);
+
+        // Guardar los cambios en la base de datos
+        Cineclub updatedCineclub = cineclubRepository.save(existingCineclub);
+
+        // Devolver el cineclub modificado
+        return EntityToDto(updatedCineclub);
+
     }
 
     @Override
     public CineclubDto removeMovieToCineclub(Long cineclubId, Long movieId) {
-        return null;
+        Cineclub existingCineclub = cineclubRepository.findById(cineclubId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró un cineclub con el ID proporcionado"));
+
+        // Buscar la película por su ID
+        Film existingFilm = filmRepository.findById(movieId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró una película con el ID proporcionado"));
+
+        // Eliminar la película del cineclub
+        existingCineclub.getFilms().remove(existingFilm);
+
+        // Guardar los cambios en la base de datos
+        Cineclub updatedCineclub = cineclubRepository.save(existingCineclub);
+
+        // Devolver el cineclub modificado
+        return EntityToDto(updatedCineclub);
     }
 
     @Override
