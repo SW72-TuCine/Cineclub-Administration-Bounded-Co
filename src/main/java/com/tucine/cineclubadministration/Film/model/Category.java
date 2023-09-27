@@ -14,15 +14,16 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Award")
-public class Award {
+@Table(name = "Category")
+public class Category {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "name", nullable = false, length = 100)
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
-a
+
     @JsonIgnore
-    @ManyToMany(mappedBy = "awards")
+    @ManyToMany(mappedBy = "categories")
     private List<Film> films;
 }
