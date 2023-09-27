@@ -5,6 +5,7 @@ import com.tucine.cineclubadministration.Cineclub.dto.receive.CineclubReceiveDto
 import com.tucine.cineclubadministration.Cineclub.model.Cineclub;
 import com.tucine.cineclubadministration.Cineclub.repository.CineclubRepository;
 import com.tucine.cineclubadministration.Cineclub.service.interf.CineclubService;
+import com.tucine.cineclubadministration.Film.dto.normal.FilmDto;
 import com.tucine.cineclubadministration.Film.model.Film;
 import com.tucine.cineclubadministration.Film.repository.FilmRepository;
 import org.modelmapper.ModelMapper;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CineclubServiceImpl implements CineclubService {
@@ -38,6 +40,10 @@ public class CineclubServiceImpl implements CineclubService {
         return modelMapper.map(cineclubDto, Cineclub.class);
     }
 
+    public FilmDto EntityToDto(Film film){
+        return modelMapper.map(film, FilmDto.class);
+    }
+
     @Override
     public CineclubDto createCineclub(CineclubReceiveDto cineclubReceiveDto) {
 
@@ -60,6 +66,20 @@ public class CineclubServiceImpl implements CineclubService {
     public void deleteCineclub(Long cineclubId) {
 
     }
+
+    @Override
+    public List<FilmDto> getAllMoviesByCineclubId(Long cineclubId) {
+
+        Cineclub cineclub = cineclubRepository.findById(cineclubId)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró un cineclub con el ID proporcionado"));
+
+        List<FilmDto> filmsInOneCineclub = cineclub.getFilms().stream()
+                .map(film -> EntityToDto(film)) // Utiliza un método específico para mapear Film a FilmDto
+                .collect(Collectors.toList());
+
+        return filmsInOneCineclub;
+    }
+
 
     @Override
     public CineclubDto addMovieToCineclub(Long cineclubId, Long movieId) {
