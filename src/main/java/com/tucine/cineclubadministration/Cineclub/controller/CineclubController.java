@@ -46,7 +46,7 @@ public class CineclubController {
     //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/cineclubs/{cineclubId}
     //Method: GET
     @Transactional(readOnly = true)
-    @GetMapping("/cineclubs/{cineclubId}")
+    @GetMapping("/cineclubs/byName")
     public ResponseEntity<CineclubDto> getCineclubByName(String cineclubName){
         return new ResponseEntity<>(cineclubService.getCineclubByName(cineclubName), org.springframework.http.HttpStatus.OK);
     }
@@ -71,7 +71,7 @@ public class CineclubController {
     //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/cineclubs/{cineclubId}
     //Method: PUT
     @Transactional
-    @PutMapping("/cineclubs/{cineclubId}")
+    @PutMapping("/cineclubs/suspend/{cineclubId}")
     public ResponseEntity<CineclubDto> suspendCineclub(@PathVariable Long cineclubId){
         return new ResponseEntity<>(cineclubService.suspendCineclub(cineclubId), org.springframework.http.HttpStatus.OK);
     }
@@ -79,7 +79,7 @@ public class CineclubController {
     //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/cineclubs/{cineclubId}
     //Method: PUT
     @Transactional
-    @PutMapping("/cineclubs/{cineclubId}")
+    @PutMapping("/cineclubs/hide/{cineclubId}")
     public ResponseEntity<CineclubDto> hideCineclub(@PathVariable Long cineclubId){
         return new ResponseEntity<>(cineclubService.hideCineclub(cineclubId), org.springframework.http.HttpStatus.OK);
     }
@@ -87,7 +87,7 @@ public class CineclubController {
     //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/cineclubs/{cineclubId}
     //Method: PUT
     @Transactional
-    @PutMapping("/cineclubs/{cineclubId}")
+    @PutMapping("/cineclubs/modify/{cineclubId}")
     public ResponseEntity<CineclubDto> modifyCineclub(@PathVariable Long cineclubId, @RequestBody CineclubReceiveDto cineclubReceiveDto){
         return new ResponseEntity<>(cineclubService.modifyCineclub(cineclubId, cineclubReceiveDto), org.springframework.http.HttpStatus.OK);
     }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.tucine.cineclubadministration.Film.model.ExternalMovie;
 import com.tucine.cineclubadministration.Cineclub.model.Cineclub;
 import com.tucine.cineclubadministration.Cineclub.repository.CineclubRepository;
 import com.tucine.cineclubadministration.Film.dto.normal.*;
