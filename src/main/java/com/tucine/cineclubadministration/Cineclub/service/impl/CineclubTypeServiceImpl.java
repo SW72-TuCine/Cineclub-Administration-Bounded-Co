@@ -4,6 +4,7 @@ import com.tucine.cineclubadministration.Cineclub.dto.normal.CineclubTypeDto;
 import com.tucine.cineclubadministration.Cineclub.model.CineclubType;
 import com.tucine.cineclubadministration.Cineclub.repository.CineclubTypeRepository;
 import com.tucine.cineclubadministration.Cineclub.service.interf.CineclubTypeService;
+import com.tucine.cineclubadministration.shared.exception.ValidationException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,14 +53,14 @@ public class CineclubTypeServiceImpl implements CineclubTypeService {
 
     private void existCineclubTypeByName(String name) {
         if(cineclubTypeRepository.existsByName(name)){
-            throw new RuntimeException("Ya existe un tipo de cineclub con ese nombre");
+            throw new ValidationException("Ya existe un tipo de cineclub con ese nombre");
         }
     }
 
     private void validateCineclubType(CineclubTypeDto cineclubTypeDto) {
 
         if(cineclubTypeDto.getName()==null || cineclubTypeDto.getName().isEmpty()){
-            throw new RuntimeException("El nombre no puede ser nulo o vacío");
+            throw new ValidationException("El nombre no puede ser nulo o vacío");
         }
     }
 
@@ -67,7 +68,7 @@ public class CineclubTypeServiceImpl implements CineclubTypeService {
     public CineclubTypeDto modifyCineclubType(Long cineclubTypeId, CineclubTypeDto cineclubTypeDto) {
 
         CineclubType cineclubType=cineclubTypeRepository.findById(cineclubTypeId)
-                .orElseThrow(()->new RuntimeException("No se encontró un tipo de cineclub con el ID proporcionado"));
+                .orElseThrow(()->new ValidationException("No se encontró un tipo de cineclub con el ID proporcionado"));
 
         validateCineclubType(cineclubTypeDto);
         cineclubType.setName(cineclubTypeDto.getName());
@@ -79,7 +80,7 @@ public class CineclubTypeServiceImpl implements CineclubTypeService {
     public void deleteCineclubType(Long cineclubTypeId) {
 
         CineclubType cineclubType=cineclubTypeRepository.findById(cineclubTypeId)
-                .orElseThrow(()->new RuntimeException("No se encontró un tipo de cineclub con el ID proporcionado"));
+                .orElseThrow(()->new ValidationException("No se encontró un tipo de cineclub con el ID proporcionado"));
 
         cineclubTypeRepository.delete(cineclubType);
     }

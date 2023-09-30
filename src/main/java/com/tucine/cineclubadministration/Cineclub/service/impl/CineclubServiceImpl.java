@@ -8,6 +8,7 @@ import com.tucine.cineclubadministration.Cineclub.service.interf.CineclubService
 import com.tucine.cineclubadministration.Film.dto.normal.FilmDto;
 import com.tucine.cineclubadministration.Film.model.Film;
 import com.tucine.cineclubadministration.Film.repository.FilmRepository;
+import com.tucine.cineclubadministration.shared.exception.ValidationException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,7 +61,7 @@ public class CineclubServiceImpl implements CineclubService {
     @Override
     public CineclubDto modifyCineclub(Long cineclubId, CineclubReceiveDto cineclubReceiveDto) {
         Cineclub existingCineclub = cineclubRepository.findById(cineclubId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró un cineclub con el ID proporcionado"));
+                .orElseThrow(() -> new ValidationException("No se encontró un cineclub con el ID proporcionado"));
 
         validateCineclub(cineclubReceiveDto);
 
@@ -116,7 +117,7 @@ public class CineclubServiceImpl implements CineclubService {
     @Override
     public void deleteCineclub(Long cineclubId) {
         Cineclub existingCineclub = cineclubRepository.findById(cineclubId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró un cineclub con el ID proporcionado"));
+                .orElseThrow(() -> new ValidationException("No se encontró un cineclub con el ID proporcionado"));
 
         cineclubRepository.delete(existingCineclub);
     }
@@ -125,7 +126,7 @@ public class CineclubServiceImpl implements CineclubService {
     public List<FilmDto> getAllMoviesByCineclubId(Long cineclubId) {
 
         Cineclub cineclub = cineclubRepository.findById(cineclubId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró un cineclub con el ID proporcionado"));
+                .orElseThrow(() -> new ValidationException("No se encontró un cineclub con el ID proporcionado"));
 
         List<FilmDto> filmsInOneCineclub = cineclub.getFilms().stream()
                 .map(film -> EntityToDto(film)) // Utiliza un método específico para mapear Film a FilmDto
@@ -139,11 +140,11 @@ public class CineclubServiceImpl implements CineclubService {
     public CineclubDto addMovieToCineclub(Long cineclubId, Long movieId) {
 
         Cineclub existingCineclub = cineclubRepository.findById(cineclubId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró un cineclub con el ID proporcionado"));
+                .orElseThrow(() -> new ValidationException("No se encontró un cineclub con el ID proporcionado"));
 
         // Buscar la película por su ID
         Film existingFilm = filmRepository.findById(movieId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró una película con el ID proporcionado"));
+                .orElseThrow(() -> new ValidationException("No se encontró una película con el ID proporcionado"));
 
         // Agregar la película al cineclub
         existingCineclub.getFilms().add(existingFilm);
@@ -159,11 +160,11 @@ public class CineclubServiceImpl implements CineclubService {
     @Override
     public CineclubDto removeMovieToCineclub(Long cineclubId, Long movieId) {
         Cineclub existingCineclub = cineclubRepository.findById(cineclubId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró un cineclub con el ID proporcionado"));
+                .orElseThrow(() -> new ValidationException("No se encontró un cineclub con el ID proporcionado"));
 
         // Buscar la película por su ID
         Film existingFilm = filmRepository.findById(movieId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró una película con el ID proporcionado"));
+                .orElseThrow(() -> new ValidationException("No se encontró una película con el ID proporcionado"));
 
         // Eliminar la película del cineclub
         existingCineclub.getFilms().remove(existingFilm);
@@ -179,7 +180,7 @@ public class CineclubServiceImpl implements CineclubService {
     public CineclubDto suspendCineclub(Long cineclubId) {
 
         Cineclub cineclub = cineclubRepository.findById(cineclubId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró un cineclub con el ID proporcionado"));
+                .orElseThrow(() -> new ValidationException("No se encontró un cineclub con el ID proporcionado"));
 
         if(!(cineclub.getState()=="Suspendido"))
             cineclub.setState("Suspendido");
@@ -191,7 +192,7 @@ public class CineclubServiceImpl implements CineclubService {
     public CineclubDto hideCineclub(Long cineclubId) {
 
             Cineclub cineclub = cineclubRepository.findById(cineclubId)
-                    .orElseThrow(() -> new IllegalArgumentException("No se encontró un cineclub con el ID proporcionado"));
+                    .orElseThrow(() -> new ValidationException("No se encontró un cineclub con el ID proporcionado"));
 
             if(!(cineclub.getState()=="Oculto"))
                 cineclub.setState("Oculto");
@@ -202,7 +203,7 @@ public class CineclubServiceImpl implements CineclubService {
     @Override
     public CineclubDto getCineclubById(Long cineclubId) {
         Cineclub cineclub = cineclubRepository.findById(cineclubId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró un cineclub con el ID proporcionado"));
+                .orElseThrow(() -> new ValidationException("No se encontró un cineclub con el ID proporcionado"));
 
         return EntityToDto(cineclub);
     }
@@ -212,7 +213,7 @@ public class CineclubServiceImpl implements CineclubService {
         Cineclub cineclub = cineclubRepository.findByName(cineclubName);
 
         if (cineclub == null) {
-            throw new IllegalArgumentException("No se encontró un cineclub con el nombre proporcionado");
+            throw new ValidationException("No se encontró un cineclub con el nombre proporcionado");
         }
         return EntityToDto(cineclub);
     }
@@ -220,22 +221,22 @@ public class CineclubServiceImpl implements CineclubService {
     private void validateCineclub(CineclubReceiveDto cineclubReceiveDto) {
 
         if(cineclubReceiveDto.getName()==null || cineclubReceiveDto.getName().isEmpty()){
-            throw new RuntimeException("El nombre del cineclub no puede estar vacio");
+            throw new ValidationException("El nombre del cineclub no puede estar vacio");
         }
         if(cineclubReceiveDto.getCapacity()==null || cineclubReceiveDto.getCapacity()<0){
-            throw new RuntimeException("La capacidad del cineclub no puede ser nula o negativa");
+            throw new ValidationException("La capacidad del cineclub no puede ser nula o negativa");
         }
         if(cineclubReceiveDto.getAddress()==null || cineclubReceiveDto.getAddress().isEmpty()){
-            throw new RuntimeException("La dirección del cineclub no puede estar vacia");
+            throw new ValidationException("La dirección del cineclub no puede estar vacia");
         }
         if(cineclubReceiveDto.getOwnerId()==null){
-            throw new RuntimeException("El id del dueño no puede ser nulo");
+            throw new ValidationException("El id del dueño no puede ser nulo");
         }
 
     }
     private void existCineclubByName(String name) {
         if(cineclubRepository.existsByName(name)){
-            throw new RuntimeException("Ya existe un cineclub con ese nombre");
+            throw new ValidationException("Ya existe un cineclub con ese nombre");
         }
     }
 }
