@@ -5,6 +5,7 @@ import com.tucine.cineclubadministration.Film.dto.receive.ContentRatingReceiveDt
 import com.tucine.cineclubadministration.Film.model.ContentRating;
 import com.tucine.cineclubadministration.Film.repository.ContentRatingRepository;
 import com.tucine.cineclubadministration.Film.service.interf.ContentRatingService;
+import com.tucine.cineclubadministration.shared.exception.ValidationException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,7 +59,7 @@ public class ContentRatingServiceImpl implements ContentRatingService {
     public ContentRatingDto modifyContentRating(Long contentRatingId, ContentRatingReceiveDto contentRatingReceiveDto) {
         // Buscar la clasificación por su ID
         ContentRating existingContentRating = contentRatingRepository.findById(contentRatingId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró una clasificación con el ID proporcionado"));
+                .orElseThrow(() -> new ValidationException("No se encontró una clasificación con el ID proporcionado"));
 
         // Validar y asignar los nuevos valores
         validateContentRating(contentRatingReceiveDto);
@@ -73,26 +74,26 @@ public class ContentRatingServiceImpl implements ContentRatingService {
     public void deleteContentRating(Long contentRatingId) {
         // Buscar la clasificación por su ID
         ContentRating existingContentRating = contentRatingRepository.findById(contentRatingId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró una clasificación con el ID proporcionado"));
+                .orElseThrow(() -> new ValidationException("No se encontró una clasificación con el ID proporcionado"));
 
         // Eliminar la clasificación de la base de datos
         contentRatingRepository.delete(existingContentRating);
     }
     private void validateContentRating(ContentRatingReceiveDto contentRatingReceiveDto) {
         if (contentRatingReceiveDto == null ) {
-            throw new IllegalArgumentException("ContentRating no contiene nada");
+            throw new ValidationException("ContentRating no contiene nada");
         }
         if (contentRatingReceiveDto.getName() == null || contentRatingReceiveDto.getName().isEmpty()) {
-            throw new IllegalArgumentException("El nombre de la clasifiación es requerido");
+            throw new ValidationException("El nombre de la clasifiación es requerido");
         }
         if(contentRatingReceiveDto.getDescription()==null || contentRatingReceiveDto.getDescription().isEmpty()){
-            throw new IllegalArgumentException("La descripción de la clasificación es requerida");
+            throw new ValidationException("La descripción de la clasificación es requerida");
         }
     }
 
     private void existContentRatingByName(String name){
         if(contentRatingRepository.existsByName(name)){
-            throw new IllegalArgumentException("Ya existe una clasificación con ese nombre");
+            throw new ValidationException("Ya existe una clasificación con ese nombre");
         }
     }
 }

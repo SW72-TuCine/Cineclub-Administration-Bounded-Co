@@ -5,6 +5,7 @@ import com.tucine.cineclubadministration.Film.dto.receive.ActorReceiveDto;
 import com.tucine.cineclubadministration.Film.model.Actor;
 import com.tucine.cineclubadministration.Film.repository.ActorRepository;
 import com.tucine.cineclubadministration.Film.service.interf.ActorService;
+import com.tucine.cineclubadministration.shared.exception.ValidationException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,7 +59,7 @@ public class ActorServiceImpl implements ActorService {
     public ActorDto modifyActor(Long actorId, ActorReceiveDto actorReceiveDto) {
         // Buscar el actor existente por su ID
         Actor existingActor = actorRepository.findById(actorId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró un actor con el ID proporcionado"));
+                .orElseThrow(() -> new ValidationException("No se encontró un actor con el ID proporcionado"));
 
         // Actualizar los campos del actor con los datos de ActorReceiveDto
         existingActor.setFirstName(actorReceiveDto.getFirstName());
@@ -77,7 +78,7 @@ public class ActorServiceImpl implements ActorService {
     public void deleteActor(Long actorId) {
         // Buscar el actor por su ID
         Actor actorToDelete = actorRepository.findById(actorId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró un actor con el ID proporcionado"));
+                .orElseThrow(() -> new ValidationException("No se encontró un actor con el ID proporcionado"));
 
         // Eliminar el actor de la base de datos
         actorRepository.delete(actorToDelete);
@@ -85,19 +86,19 @@ public class ActorServiceImpl implements ActorService {
 
     private void validateActor(ActorReceiveDto actor) {
         if (actor.getFirstName() == null || actor.getFirstName().isEmpty()) {
-            throw new IllegalArgumentException("El nombre es obligatorio");
+            throw new ValidationException("El nombre es obligatorio");
         }
         if (actor.getLastName() == null || actor.getLastName().isEmpty()) {
-            throw new IllegalArgumentException("El apellido es obligatorio");
+            throw new ValidationException("El apellido es obligatorio");
         }
         if (actor.getBirthdate() == null) {
-            throw new IllegalArgumentException("La fecha de nacimiento es obligatoria");
+            throw new ValidationException("La fecha de nacimiento es obligatoria");
         }
     }
 
     private void existActorByFirstName(String firstName,String lastName){
         if (actorRepository.existsByFirstNameAndLastName(firstName, lastName)) {
-            throw new IllegalArgumentException("Ya existe un actor con el nombre " + firstName + " " + lastName);
+            throw new ValidationException("Ya existe un actor con el nombre " + firstName + " " + lastName);
         }
     }
 

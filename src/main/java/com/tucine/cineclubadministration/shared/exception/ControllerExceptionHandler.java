@@ -20,7 +20,6 @@ public class ControllerExceptionHandler {
         );
         return message;
     }
-
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorMessage validationException(ValidationException ex, WebRequest request) {

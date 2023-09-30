@@ -5,6 +5,7 @@ import com.tucine.cineclubadministration.Film.dto.receive.CategoryReceiveDto;
 import com.tucine.cineclubadministration.Film.model.Category;
 import com.tucine.cineclubadministration.Film.repository.CategoryRepository;
 import com.tucine.cineclubadministration.Film.service.interf.CategoryService;
+import com.tucine.cineclubadministration.shared.exception.ValidationException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,7 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto modifyCategory(Long categoryId, CategoryReceiveDto updatedCategory) {
         // Primero, verificamos si la categoría existe en la base de datos
         Category existingCategory = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
+                .orElseThrow(() -> new ValidationException("Categoría no encontrada"));
 
         // Actualizamos los campos de la categoría existente con los valores proporcionados
         existingCategory.setName(updatedCategory.getName());
@@ -74,20 +75,20 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteCategory(Long categoryId) {
         // Verificamos si la categoría existe en la base de datos
         Category existingCategory = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
+                .orElseThrow(() -> new ValidationException("Categoría no encontrada"));
 
         // Eliminamos la categoría de la base de datos
         categoryRepository.delete(existingCategory);
     }
     private void validateCategory(CategoryDto category) {
         if(category.getName().isEmpty() || category.getName() == null) {
-            throw new IllegalArgumentException("El nombre de la categoría es obligatorio");
+            throw new ValidationException("El nombre de la categoría es obligatorio");
         }
     }
 
     private void existCategoryByName(String name) {
         if(categoryRepository.existsByName(name)) {
-            throw new IllegalArgumentException("Ya existe una categoría con ese nombre");
+            throw new ValidationException("Ya existe una categoría con ese nombre");
         }
     }
 }

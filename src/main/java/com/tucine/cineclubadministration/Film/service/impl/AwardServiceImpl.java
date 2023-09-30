@@ -5,6 +5,7 @@ import com.tucine.cineclubadministration.Film.dto.receive.AwardReceiveDto;
 import com.tucine.cineclubadministration.Film.model.Award;
 import com.tucine.cineclubadministration.Film.repository.AwardRepository;
 import com.tucine.cineclubadministration.Film.service.interf.AwardService;
+import com.tucine.cineclubadministration.shared.exception.ValidationException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,7 +60,7 @@ public class AwardServiceImpl implements AwardService {
     public AwardDto modifyAward(Long awardId, AwardReceiveDto awardReceiveDto) {
         // Buscar el premio por su ID
         Award existingAward = awardRepository.findById(awardId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró un premio con el ID proporcionado"));
+                .orElseThrow(() -> new ValidationException("No se encontró un premio con el ID proporcionado"));
 
         // Validar y actualizar los datos del premio
         validateAward(awardReceiveDto);
@@ -76,7 +77,7 @@ public class AwardServiceImpl implements AwardService {
     public void deleteAward(Long awardId) {
         // Buscar el premio por su ID
         Award existingAward = awardRepository.findById(awardId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró un premio con el ID proporcionado"));
+                .orElseThrow(() -> new ValidationException("No se encontró un premio con el ID proporcionado"));
 
         // Eliminar el premio de la base de datos
         awardRepository.delete(existingAward);
@@ -84,13 +85,13 @@ public class AwardServiceImpl implements AwardService {
 
     private void validateAward(AwardReceiveDto award){
         if(award.getName()==null || award.getName().isEmpty()){
-            throw new IllegalArgumentException("El nombre del premio no puede estar vacio");
+            throw new ValidationException("El nombre del premio no puede estar vacio");
         }
     }
 
     private void existAward(String name){
         if(awardRepository.existsByName(name)){
-            throw new IllegalArgumentException("Ya existe un premio con ese nombre");
+            throw new ValidationException("Ya existe un premio con ese nombre");
         }
     }
 }

@@ -17,6 +17,7 @@ import com.tucine.cineclubadministration.Film.repository.AwardRepository;
 import com.tucine.cineclubadministration.Film.repository.CategoryRepository;
 import com.tucine.cineclubadministration.Film.repository.FilmRepository;
 import com.tucine.cineclubadministration.Film.service.interf.FilmService;
+import com.tucine.cineclubadministration.shared.exception.ValidationException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -82,7 +83,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public ContentRatingDto getContentRatingByFilmId(Long filmId) {
         Film film = filmRepository.findById(filmId)
-                .orElseThrow(() -> new RuntimeException("No se encontró la película con el id: " + filmId));
+                .orElseThrow(() -> new ValidationException("No se encontró la película con el id: " + filmId));
 
         return modelMapper.map(film.getContentRating(), ContentRatingDto.class);
     }
@@ -91,7 +92,7 @@ public class FilmServiceImpl implements FilmService {
     public List<CategoryDto> getAllCategoriesByFilmId(Long filmId) {
 
         Film film =filmRepository.findById(filmId)
-                .orElseThrow(() -> new RuntimeException("No se encontró la película con el id: " + filmId));
+                .orElseThrow(() -> new ValidationException("No se encontró la película con el id: " + filmId));
 
         return film.getCategories().stream()
                 .map(category -> modelMapper.map(category, CategoryDto.class))
@@ -102,7 +103,7 @@ public class FilmServiceImpl implements FilmService {
     public List<ActorDto> getAllActorsByFilmId(Long filmId) {
 
         Film film = filmRepository.findById(filmId)
-                .orElseThrow(() -> new RuntimeException("No se encontró la película con el id: " + filmId));
+                .orElseThrow(() -> new ValidationException("No se encontró la película con el id: " + filmId));
 
         return film.getActors().stream()
                 .map(actor -> modelMapper.map(actor, ActorDto.class))
@@ -112,7 +113,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<AwardDto> getAllAwardsByFilmId(Long filmId) {
         Film film = filmRepository.findById(filmId)
-                .orElseThrow(() -> new RuntimeException("No se encontró la película con el id: " + filmId));
+                .orElseThrow(() -> new ValidationException("No se encontró la película con el id: " + filmId));
 
         return film.getAwards().stream()
                 .map(award -> modelMapper.map(award, AwardDto.class))
@@ -172,6 +173,8 @@ public class FilmServiceImpl implements FilmService {
 
     private List<String> getAllCategoriesFromExternalMovieAPI(List<Integer> listCategoryIdExternalAPI){
 
+        //supongo que aquí faltaría delimitar cuantas películas va a devolver o algo así para que no sea tan pesado
+
         String jsonResponse = getStringResponseAllCategoriesFromExternalMovieAPI();
 
         //Crear una lista para almacenar las categorias
@@ -207,6 +210,8 @@ public class FilmServiceImpl implements FilmService {
         return null;
     }
     private String getStringResponseForSearchFilmAPI(String title){
+
+        //Es esto necesario?
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
@@ -281,7 +286,7 @@ public class FilmServiceImpl implements FilmService {
     public List<FilmDto> getFilmsByCategory(String category) {
 
         if(!categoryRepository.existsByName(category)){
-            throw new RuntimeException("No existe la categoría con el nombre: " + category);
+            throw new ValidationException("No existe la categoría con el nombre: " + category);
         }
 
         List<Film> films = filmRepository.findAll();
@@ -300,16 +305,16 @@ public class FilmServiceImpl implements FilmService {
     public FilmDto addCategoriesToFilmByCategoriesIds(Long filmId, List<Long> categoriesIds) {
         // Verificar que la lista de categorías no esté vacía
         if (categoriesIds.isEmpty()) {
-            throw new RuntimeException("La lista de categorías no puede estar vacía");
+            throw new ValidationException("La lista de categorías no puede estar vacía");
         }
         // Obtener la película por su ID (si no se encuentra, lanzará una excepción)
         Film film = filmRepository.findById(filmId)
-                .orElseThrow(() -> new RuntimeException("No se encontró la película con el ID: " + filmId));
+                .orElseThrow(() -> new ValidationException("No se encontró la película con el ID: " + filmId));
 
         // Verificar la existencia de categorías y evitar duplicados
         for (Long categoryId : categoriesIds) {
             Category category = categoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new RuntimeException("No se encontró la categoría con el ID: " + categoryId));
+                    .orElseThrow(() -> new ValidationException("No se encontró la categoría con el ID: " + categoryId));
 
             if (!film.getCategories().contains(category)) {
                 film.getCategories().add(category);
@@ -327,15 +332,15 @@ public class FilmServiceImpl implements FilmService {
 
 
         if(actorsIds.isEmpty()){
-            throw new RuntimeException("La lista de actores no puede estar vacía");
+            throw new ValidationException("La lista de actores no puede estar vacía");
         }
 
         Film film = filmRepository.findById(filmId)
-                .orElseThrow(() -> new RuntimeException("No se encontró la película con el ID: " + filmId));
+                .orElseThrow(() -> new ValidationException("No se encontró la película con el ID: " + filmId));
 
         for(Long actorId: actorsIds){
             Actor actor = actorRepository.findById(actorId)
-                    .orElseThrow(() -> new RuntimeException("No se encontró el actor con el ID: " + actorId));
+                    .orElseThrow(() -> new ValidationException("No se encontró el actor con el ID: " + actorId));
 
             if(!film.getActors().contains(actor)){
                 film.getActors().add(actor);
@@ -351,15 +356,15 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public FilmDto addAwardsToFilmByAwardsIds(Long filmId, List<Long> awardsIds) {
         if(awardsIds.isEmpty()){
-            throw new RuntimeException("La lista de premios no puede estar vacía");
+            throw new ValidationException("La lista de premios no puede estar vacía");
         }
 
         Film film = filmRepository.findById(filmId)
-                .orElseThrow(() -> new RuntimeException("No se encontró la película con el ID: " + filmId));
+                .orElseThrow(() -> new ValidationException("No se encontró la película con el ID: " + filmId));
 
         for(Long awardId: awardsIds){
             Award award = awardRepository.findById(awardId)
-                    .orElseThrow(() -> new RuntimeException("No se encontró el premio con el ID: " + awardId));
+                    .orElseThrow(() -> new ValidationException("No se encontró el premio con el ID: " + awardId));
 
             if(!film.getAwards().contains(award)){
                 film.getAwards().add(award);
@@ -374,10 +379,10 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public FilmDto addCineclubToFilmByCineclubId(Long filmId, Long cineclubId) {
         Film film = filmRepository.findById(filmId)
-                .orElseThrow(() -> new RuntimeException("No se encontró la película con el ID: " + filmId));
+                .orElseThrow(() -> new ValidationException("No se encontró la película con el ID: " + filmId));
 
         Cineclub cineclub = cineclubRepository.findById(cineclubId)
-                .orElseThrow(() -> new RuntimeException("No se encontró el cineclub con el ID: " + cineclubId));
+                .orElseThrow(() -> new ValidationException("No se encontró el cineclub con el ID: " + cineclubId));
 
         if(!film.getCineclubs().contains(cineclub)){
             film.getCineclubs().add(cineclub);
@@ -390,9 +395,12 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public FilmDto getFilmByTitle(String title) {
+
+        //TODO: Verificar si esto está correcto
+
         Film film = filmRepository.findByTitle(title);
         if(film == null){
-            throw new RuntimeException("No se encontró la película con el título: " + title);
+            throw new ValidationException("No se encontró la película con el título: " + title);
         }
 
         return modelMapper.map(film, FilmDto.class);
@@ -401,7 +409,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public FilmDto getFilmById(Long filmId) {
         Film film = filmRepository.findById(filmId)
-                .orElseThrow(() -> new RuntimeException("No se encontró la película con el ID: " + filmId));
+                .orElseThrow(() -> new ValidationException("No se encontró la película con el ID: " + filmId));
 
         return modelMapper.map(film, FilmDto.class);
     }
@@ -409,16 +417,16 @@ public class FilmServiceImpl implements FilmService {
 
     private void validateFilm(FilmReceiveDto filmReceiveDto) {
         if(filmReceiveDto.getTitle() == null || filmReceiveDto.getTitle().isEmpty()){
-            throw new RuntimeException("El título de la película no puede estar vacío");
+            throw new ValidationException("El título de la película no puede estar vacío");
         }
         if(filmReceiveDto.getDuration() <= 0){
-            throw new RuntimeException("La duración de la película no puede ser menor o igual a 0");
+            throw new ValidationException("La duración de la película no puede ser menor o igual a 0");
         }
         if(filmReceiveDto.getSynopsis() == null || filmReceiveDto.getSynopsis().isEmpty()){
-            throw new RuntimeException("La sinopsis de la película no puede estar vacía");
+            throw new ValidationException("La sinopsis de la película no puede estar vacía");
         }
         if(filmReceiveDto.getPosterSrc() == null || filmReceiveDto.getPosterSrc().isEmpty()){
-            throw new RuntimeException("La ruta del poster de la película no puede estar vacía");
+            throw new ValidationException("La ruta del poster de la película no puede estar vacía");
         }
 /*        if(filmReceiveDto.getTrailerSrc() == null || filmReceiveDto.getTrailerSrc().isEmpty()){
             throw new RuntimeException("La ruta del trailer de la película no puede estar vacía");
@@ -426,11 +434,11 @@ public class FilmServiceImpl implements FilmService {
 /*        if(filmReceiveDto.getActors() == null || filmReceiveDto.getActors().isEmpty()){
             throw new RuntimeException("La lista de actores de la película no puede estar vacía");
         }*/
-/*        if(filmReceiveDto.getCategories() == null || filmReceiveDto.getCategories().isEmpty()){
-            throw new RuntimeException("La lista de categorías de la película no puede estar vacía");
-        }*/
+        if(filmReceiveDto.getCategories() == null || filmReceiveDto.getCategories().isEmpty()){
+            throw new ValidationException("La lista de categorías de la película no puede estar vacía");
+        }
         if(filmReceiveDto.getContentRating() == null){
-            throw new RuntimeException("La clasificación de contenido de la película no puede estar vacía");
+            throw new ValidationException("La clasificación de contenido de la película no puede estar vacía");
         }
     }
 }
