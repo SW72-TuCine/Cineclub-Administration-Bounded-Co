@@ -20,6 +20,7 @@ import com.tucine.cineclubadministration.Film.service.interf.FilmService;
 import com.tucine.cineclubadministration.shared.exception.ValidationException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -78,6 +79,31 @@ public class FilmServiceImpl implements FilmService {
         Film film = DtoToEntity(filmDto);
 
         return EntityToDto(filmRepository.save(film));
+
+
+/*        validateFilm(filmReceiveDto);
+
+        FilmDto filmDto = modelMapper.map(filmReceiveDto, FilmDto.class);
+
+        Film film = DtoToEntity(filmDto);
+
+        // Asocia actores, premios y categorías según sus IDs
+        film.setActors(getEntitiesByIds(filmReceiveDto.getActorIds(), actorRepository));
+        film.setAwards(getEntitiesByIds(filmReceiveDto.getAwardIds(), awardRepository));
+        film.setCategories(getEntitiesByIds(filmReceiveDto.getCategoryIds(), categoryRepository));
+
+        // Guarda la película en la base de datos
+        Film savedFilm = filmRepository.save(film);
+
+        // Mapea y devuelve la película guardada como DTO
+        return EntityToDto(savedFilm);*/
+    }
+
+    private <T> List<T> getEntitiesByIds(List<Long> ids, JpaRepository<T, Long> repository) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return repository.findAllById(ids);
     }
 
     @Override
