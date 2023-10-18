@@ -9,14 +9,18 @@ import com.tucine.cineclubadministration.Film.dto.normal.FilmDto;
 import com.tucine.cineclubadministration.Film.model.Film;
 import com.tucine.cineclubadministration.Film.repository.FilmRepository;
 import com.tucine.cineclubadministration.shared.exception.ValidationException;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CineclubServiceImpl implements CineclubService {
 
     @Autowired
@@ -27,6 +31,9 @@ public class CineclubServiceImpl implements CineclubService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    private final WebClient.Builder webClientBuilder;
+
     @Override
     public List<CineclubDto> getAllCineclubs() {
         List<Cineclub> cineclubs = cineclubRepository.findAll();
@@ -47,6 +54,17 @@ public class CineclubServiceImpl implements CineclubService {
 
     @Override
     public CineclubDto createCineclub(CineclubReceiveDto cineclubReceiveDto) {
+
+/*
+        ResponseEntity<?> respuesta= this.webClientBuilder.build()
+                        .get()
+                        .uri("http://localhost:8082/api/TuCine/v1/account_management/users/"+cineclubReceiveDto.getOwnerId())
+                        .retrieve()
+                        .bodyToMono(String.class)
+                        .block();
+
+*/
+
 
         validateCineclub(cineclubReceiveDto);
         existCineclubByName(cineclubReceiveDto.getName());
