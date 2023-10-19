@@ -13,7 +13,7 @@ public class CineclubReceiveDto {
     private String name;
     private String address;
     private String phone;
-    private Date openInHours;
+    private String openInHours;
     private String socialReason;
     private String RUC;
     private String logoSrc;

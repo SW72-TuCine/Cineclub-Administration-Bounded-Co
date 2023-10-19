@@ -31,7 +31,7 @@ public class CineclubController {
     //Method: POST
     @Transactional()
     @PostMapping("/cineclubs")
-    public ResponseEntity<CineclubDto> createCineclub(CineclubReceiveDto cineclubReceiveDto){
+    public ResponseEntity<CineclubDto> createCineclub(@RequestBody CineclubReceiveDto cineclubReceiveDto){
         return new ResponseEntity<>(cineclubService.createCineclub(cineclubReceiveDto), org.springframework.http.HttpStatus.CREATED);
     }
 
@@ -39,7 +39,7 @@ public class CineclubController {
     //Method: GET
     @Transactional(readOnly = true)
     @GetMapping("/cineclubs/{cineclubId}")
-    public ResponseEntity<CineclubDto> getCineclubById(Long cineclubId){
+    public ResponseEntity<CineclubDto> getCineclubById(Long cineclubId, @RequestBody CineclubReceiveDto cineclubReceiveDto){
         return new ResponseEntity<>(cineclubService.getCineclubById(cineclubId), org.springframework.http.HttpStatus.OK);
     }
 

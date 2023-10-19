@@ -30,7 +30,7 @@ public class Cineclub {
     @Column(name = "phone", nullable = false, length = 9)
     private String phone;
     @Column(name = "open_in_hours", nullable = false, length = 100)
-    private Date openInHours;
+    private String openInHours;
     @Column(name = "social_reason", nullable = false, length = 255)
     private String socialReason;
     @Column(name = "RUC", nullable = false, length = 11)
