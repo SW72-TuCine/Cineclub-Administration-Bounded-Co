@@ -1,5 +1,6 @@
 package com.tucine.cineclubadministration.Cineclub.controller;
 
+import com.tucine.cineclubadministration.Cineclub.client.UserClient;
 import com.tucine.cineclubadministration.Cineclub.dto.normal.CineclubDto;
 import com.tucine.cineclubadministration.Cineclub.dto.receive.CineclubReceiveDto;
 import com.tucine.cineclubadministration.Cineclub.service.interf.CineclubService;
@@ -18,6 +19,8 @@ public class CineclubController {
 
     @Autowired
     private CineclubService cineclubService;
+    @Autowired
+    private UserClient userClient;
 
     // URL: http://localhost:8080/api/TuCine/V1/cineclubs
     // Method: GET
@@ -32,6 +35,10 @@ public class CineclubController {
     @Transactional()
     @PostMapping("/cineclubs")
     public ResponseEntity<CineclubDto> createCineclub(@RequestBody CineclubReceiveDto cineclubReceiveDto){
+
+        if (!userClient.checkIfUserExist(cineclubReceiveDto.getOwnerId())){
+            throw new RuntimeException("User does not exist");
+        }
         return new ResponseEntity<>(cineclubService.createCineclub(cineclubReceiveDto), org.springframework.http.HttpStatus.CREATED);
     }
 
