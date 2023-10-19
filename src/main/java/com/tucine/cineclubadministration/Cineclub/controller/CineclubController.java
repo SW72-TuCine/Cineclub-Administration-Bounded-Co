@@ -39,7 +39,7 @@ public class CineclubController {
     //Method: GET
     @Transactional(readOnly = true)
     @GetMapping("/cineclubs/{cineclubId}")
-    public ResponseEntity<CineclubDto> getCineclubById(Long cineclubId, @RequestBody CineclubReceiveDto cineclubReceiveDto){
+    public ResponseEntity<CineclubDto> getCineclubById(Long cineclubId){
         return new ResponseEntity<>(cineclubService.getCineclubById(cineclubId), org.springframework.http.HttpStatus.OK);
     }
 
