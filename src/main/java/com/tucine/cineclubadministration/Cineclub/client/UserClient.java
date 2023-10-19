@@ -10,5 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 public interface UserClient {
 
     @RequestMapping("/api/TuCine/v1/account_management/users/verify/{userId}")
-    boolean checkIfUserExist(@PathVariable("userId") Long userId);
+    boolean checkIfUserExist(@PathVariable("userId") Long userId) throws RuntimeException;
 }
+

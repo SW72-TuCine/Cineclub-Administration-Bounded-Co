@@ -1,11 +1,13 @@
 package com.tucine.cineclubadministration.Cineclub.controller;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.tucine.cineclubadministration.Cineclub.client.UserClient;
 import com.tucine.cineclubadministration.Cineclub.dto.normal.CineclubDto;
 import com.tucine.cineclubadministration.Cineclub.dto.receive.CineclubReceiveDto;
 import com.tucine.cineclubadministration.Cineclub.service.interf.CineclubService;
 import com.tucine.cineclubadministration.Film.dto.normal.FilmDto;
 import com.tucine.cineclubadministration.Film.model.Film;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,13 +35,18 @@ public class CineclubController {
     //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/cineclubs/
     //Method: POST
     @Transactional()
+    @CircuitBreaker(name = "userService", fallbackMethod = "fallbackToUserService")
     @PostMapping("/cineclubs")
-    public ResponseEntity<CineclubDto> createCineclub(@RequestBody CineclubReceiveDto cineclubReceiveDto){
+    public ResponseEntity<?> createCineclub(@RequestBody CineclubReceiveDto cineclubReceiveDto){
 
         if (!userClient.checkIfUserExist(cineclubReceiveDto.getOwnerId())){
             throw new RuntimeException("User does not exist");
         }
         return new ResponseEntity<>(cineclubService.createCineclub(cineclubReceiveDto), org.springframework.http.HttpStatus.CREATED);
+    }
+
+    private ResponseEntity<?> fallbackToUserService(CineclubReceiveDto cineclubReceiveDto, Throwable throwable){
+        return new ResponseEntity<>("User service is not available", org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/cineclubs/{cineclubId}
