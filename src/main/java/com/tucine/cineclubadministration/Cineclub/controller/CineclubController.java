@@ -40,12 +40,13 @@ public class CineclubController {
     public ResponseEntity<?> createCineclub(@RequestBody CineclubReceiveDto cineclubReceiveDto){
 
         if (!userClient.checkIfUserExist(cineclubReceiveDto.getOwnerId())){
-            throw new RuntimeException("User does not exist");
+            return new ResponseEntity<>("User does not exist", org.springframework.http.HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(cineclubService.createCineclub(cineclubReceiveDto), org.springframework.http.HttpStatus.CREATED);
     }
 
     private ResponseEntity<?> fallbackToUserService(CineclubReceiveDto cineclubReceiveDto, Throwable throwable){
+        
         return new ResponseEntity<>("User service is not available", org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE);
     }
 
