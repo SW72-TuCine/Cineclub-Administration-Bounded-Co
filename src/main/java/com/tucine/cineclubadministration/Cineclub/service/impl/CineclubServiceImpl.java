@@ -3,9 +3,11 @@ package com.tucine.cineclubadministration.Cineclub.service.impl;
 import com.tucine.cineclubadministration.Cineclub.dto.normal.CineclubDto;
 import com.tucine.cineclubadministration.Cineclub.dto.receive.CineclubReceiveDto;
 import com.tucine.cineclubadministration.Cineclub.model.Cineclub;
+import com.tucine.cineclubadministration.Cineclub.model.CineclubType;
 import com.tucine.cineclubadministration.Cineclub.repository.CineclubRepository;
 import com.tucine.cineclubadministration.Cineclub.service.interf.CineclubService;
 import com.tucine.cineclubadministration.Film.dto.normal.FilmDto;
+import com.tucine.cineclubadministration.Film.model.Category;
 import com.tucine.cineclubadministration.Film.model.Film;
 import com.tucine.cineclubadministration.Film.repository.FilmRepository;
 import com.tucine.cineclubadministration.shared.exception.ValidationException;
@@ -153,6 +155,19 @@ public class CineclubServiceImpl implements CineclubService {
         return filmsInOneCineclub;
     }
 
+    @Override
+    public List<CineclubDto> getCineclubByCategorieName(String categorie) {
+
+        List<Cineclub> cineclubs = cineclubRepository.getAllByCineclubTypeNameContains(categorie);
+
+        // Mapear la lista de Cineclub a una lista de CineclubDto usando stream y map
+        List<CineclubDto> cineclubDtos = cineclubs.stream()
+                .map(this::EntityToDto) // Convierte cada Cineclub a CineclubDto
+                .collect(Collectors.toList()); // Recolecta los resultados en una lista
+
+        return cineclubDtos;
+    }
+
 
     @Override
     public CineclubDto addMovieToCineclub(Long cineclubId, Long movieId) {
@@ -227,13 +242,25 @@ public class CineclubServiceImpl implements CineclubService {
     }
 
     @Override
-    public CineclubDto getCineclubByName(String cineclubName) {
-        Cineclub cineclub = cineclubRepository.findByName(cineclubName);
+    public List<CineclubDto> getCineclubByName(String cineclubName) {
 
-        if (cineclub == null) {
-            throw new ValidationException("No se encontró un cineclub con el nombre proporcionado");
-        }
-        return EntityToDto(cineclub);
+
+/*        List<Cineclub> cineclubs = cineclubRepository.getAllByCineclubTypeNameContains(categorie);
+
+        // Mapear la lista de Cineclub a una lista de CineclubDto usando stream y map
+        List<CineclubDto> cineclubDtos = cineclubs.stream()
+                .map(this::EntityToDto) // Convierte cada Cineclub a CineclubDto
+                .collect(Collectors.toList()); // Recolecta los resultados en una lista
+
+        return cineclubDtos;*/
+
+        List<Cineclub> cineclubs= cineclubRepository.getAllByNameContains(cineclubName);
+
+        List<CineclubDto> cineclubDtos =cineclubs.stream()
+                .map(this::EntityToDto) // Convierte cada Cineclub a CineclubDto
+                .collect(Collectors.toList()); // Recolecta los resultados en una lista
+
+        return cineclubDtos;
     }
 
     private void validateCineclub(CineclubReceiveDto cineclubReceiveDto) {

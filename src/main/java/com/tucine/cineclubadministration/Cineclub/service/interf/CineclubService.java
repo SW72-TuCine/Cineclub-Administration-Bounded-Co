@@ -16,6 +16,8 @@ public interface CineclubService {
     void deleteCineclub(Long cineclubId);
     List<FilmDto> getAllMoviesByCineclubId(Long cineclubId);
 
+    List<CineclubDto> getCineclubByCategorieName(String categorie);
+
     CineclubDto addMovieToCineclub(Long cineclubId, Long movieId);
 
     CineclubDto removeMovieToCineclub(Long cineclubId, Long movieId);
@@ -26,6 +28,6 @@ public interface CineclubService {
 
     CineclubDto getCineclubById(Long cineclubId);
 
-    CineclubDto getCineclubByName(String cineclubName);
+    List<CineclubDto> getCineclubByName(String cineclubName);
 
 }

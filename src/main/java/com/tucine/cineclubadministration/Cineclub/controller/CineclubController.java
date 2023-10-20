@@ -43,11 +43,17 @@ public class CineclubController {
         return new ResponseEntity<>(cineclubService.getCineclubById(cineclubId), org.springframework.http.HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
+    @GetMapping("/cineclubs/byCategorie/{categorieName}")
+    public ResponseEntity<List<CineclubDto>> getCineclubsByCategorie(@PathVariable String categorieName){
+        return new ResponseEntity<>(cineclubService.getCineclubByCategorieName(categorieName),org.springframework.http.HttpStatus.OK);
+    }
+
     //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/cineclubs/{cineclubId}
     //Method: GET
     @Transactional(readOnly = true)
     @GetMapping("/cineclubs/byName")
-    public ResponseEntity<CineclubDto> getCineclubByName(String cineclubName){
+    public ResponseEntity<List<CineclubDto>> getCineclubByName(String cineclubName){
         return new ResponseEntity<>(cineclubService.getCineclubByName(cineclubName), org.springframework.http.HttpStatus.OK);
     }
 
