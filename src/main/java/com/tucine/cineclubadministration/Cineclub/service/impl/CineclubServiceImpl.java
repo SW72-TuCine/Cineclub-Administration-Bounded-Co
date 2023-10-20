@@ -1,5 +1,6 @@
 package com.tucine.cineclubadministration.Cineclub.service.impl;
 
+import com.tucine.cineclubadministration.Cineclub.client.UserClient;
 import com.tucine.cineclubadministration.Cineclub.dto.normal.CineclubDto;
 import com.tucine.cineclubadministration.Cineclub.dto.receive.CineclubReceiveDto;
 import com.tucine.cineclubadministration.Cineclub.model.Cineclub;
@@ -34,7 +35,8 @@ public class CineclubServiceImpl implements CineclubService {
     @Autowired
     private ModelMapper modelMapper;
 
-    private final WebClient.Builder webClientBuilder;
+    @Autowired
+    private UserClient userClient;
 
     @Override
     public List<CineclubDto> getAllCineclubs() {
@@ -56,24 +58,15 @@ public class CineclubServiceImpl implements CineclubService {
 
     @Override
     public CineclubDto createCineclub(CineclubReceiveDto cineclubReceiveDto) {
-
-/*
-        ResponseEntity<?> respuesta= this.webClientBuilder.build()
-                        .get()
-                        .uri("http://localhost:8082/api/TuCine/v1/account_management/users/"+cineclubReceiveDto.getOwnerId())
-                        .retrieve()
-                        .bodyToMono(String.class)
-                        .block();
-
-*/
-
+        if (!userClient.checkIfUserExist(cineclubReceiveDto.getOwnerId())) {
+            throw new ValidationException("User does not exist");
+        }
 
         validateCineclub(cineclubReceiveDto);
         existCineclubByName(cineclubReceiveDto.getName());
 
-        CineclubDto cineclubDto=modelMapper.map(cineclubReceiveDto, CineclubDto.class);
-
-        Cineclub cineclub=DtoToEntity(cineclubDto);
+        CineclubDto cineclubDto = modelMapper.map(cineclubReceiveDto, CineclubDto.class);
+        Cineclub cineclub = DtoToEntity(cineclubDto);
 
         return EntityToDto(cineclubRepository.save(cineclub));
     }
