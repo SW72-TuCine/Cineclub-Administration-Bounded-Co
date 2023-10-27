@@ -173,6 +173,7 @@ public class FilmServiceImpl implements FilmService {
                 externalMovie.setOverview(movieNode.get("overview").asText());
                 //ruta para obtener la imagen
                 externalMovie.setPosterPath("https://image.tmdb.org/t/p/original/"+movieNode.get("poster_path").asText());
+                //obtener la fecha de lanzamiento
                 externalMovie.setReleaseDate(movieNode.get("release_date").asText());
                 //obtener la categoria
                 List<Integer> listCategoryIdExternalAPI = new java.util.ArrayList<>(Collections.emptyList());

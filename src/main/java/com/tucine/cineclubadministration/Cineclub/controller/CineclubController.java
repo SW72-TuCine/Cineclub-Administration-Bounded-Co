@@ -1,6 +1,6 @@
 package com.tucine.cineclubadministration.Cineclub.controller;
 
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+/*import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;*/
 import com.tucine.cineclubadministration.Cineclub.client.UserClient;
 import com.tucine.cineclubadministration.Cineclub.dto.normal.CineclubDto;
 import com.tucine.cineclubadministration.Cineclub.dto.receive.CineclubReceiveDto;
@@ -22,8 +22,8 @@ public class CineclubController {
 
     @Autowired
     private CineclubService cineclubService;
-    @Autowired
-    private UserClient userClient;
+/*    @Autowired
+    private UserClient userClient;*/
 
     // URL: http://localhost:8080/api/TuCine/V1/cineclubs
     // Method: GET
