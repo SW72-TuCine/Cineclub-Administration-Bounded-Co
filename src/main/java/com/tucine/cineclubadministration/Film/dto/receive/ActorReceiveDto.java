@@ -10,7 +10,7 @@ import java.util.List;
 public class ActorReceiveDto {
     private String firstName;
     private String lastName;
-    private Date birthdate;
+    private String birthdate;
     private String biography;
     private String photoSrc;
 }

@@ -1,9 +1,12 @@
 package com.tucine.cineclubadministration;
 
+import com.tucine.cineclubadministration.Film.dto.receive.ActorReceiveDto;
 import com.tucine.cineclubadministration.Film.helpers.TheMovieDatabaseHelper;
 import com.tucine.cineclubadministration.Film.service.impl.FilmServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
 
 @SpringBootTest
 class CineclubAdministrationApplicationTests {
@@ -25,7 +28,21 @@ class CineclubAdministrationApplicationTests {
 
 	@Test
 	void Test4GetRatingFilmById(){
-		System.out.println(TheMovieDatabaseHelper.getContentRatingExternalMovie("507089"));
+		System.out.println(TheMovieDatabaseHelper.getContentRatingNameFromExternalMovie("507089"));
+	}
+
+	@Test
+	void Test5GetPrincipalActorsFilmByIdMovieExternalAPI(){
+
+		List<Integer> lista = TheMovieDatabaseHelper.getFirstFiveActorIdsFromExternalMovie("507089");
+		lista.forEach(System.out::println);
+	}
+
+	@Test
+	void Test6GetPrincipalActorsFilmByIdMovieExternalAPI(){
+
+		List<ActorReceiveDto> listaActores = TheMovieDatabaseHelper.getActorsFromExternalMovie("507089");
+		listaActores.forEach(System.out::println);
 	}
 
 }
