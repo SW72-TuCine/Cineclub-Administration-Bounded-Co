@@ -45,4 +45,9 @@ class CineclubAdministrationApplicationTests {
 		listaActores.forEach(System.out::println);
 	}
 
+	@Test
+	void Test7GetFilmInformationFromExternalAPI(){
+		System.out.println(TheMovieDatabaseHelper.getInformationAboutMovieFromExternalAPI("507089"));
+	}
+
 }
