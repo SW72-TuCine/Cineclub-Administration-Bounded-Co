@@ -29,6 +29,13 @@ public class TheMovieDatabaseHelper {
     static String API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxMjhjMjQ4YWEwNTMwOGIzMDUyYWZiNWQ4MzU1NmY2ZSIsInN1YiI6IjY1MGI5NTdmMmM2YjdiMDBmZTQ1YjY5YyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zQL9P8NaXE9qwDIWk3Jzgc0m0R7QqjFdBiXQl0k3AXs";
     static String DEFAULT_LANGUAGE = "es-PE";
 
+    private static String nullOrText(JsonNode node) {
+        return node != null ? node.asText() : null;
+    }
+
+    private static String nullOrImageUrl(JsonNode node) {
+        return node != null ? "https://image.tmdb.org/t/p/original" + node.asText() : null;
+    }
     public static String convertRatingUStoOurRatingFormat(String ratingUS) {
         return switch (ratingUS) {
             case "G", "PG" -> "APT";
@@ -86,7 +93,10 @@ public class TheMovieDatabaseHelper {
             //Obtener el primer elemento del arreglo results:
             JsonNode firstResult = jsonNode.get("results").get(0);
 
-            
+            if(firstResult == null){
+                return null;
+            }
+
             String video_youtube_key = firstResult.get("key").asText();
             return youtube_link + video_youtube_key;
         } catch (Exception e) {
@@ -108,6 +118,7 @@ public class TheMovieDatabaseHelper {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(responseBody);
             //Obtener el tiempo de duración de la película:
+            if(jsonNode.get("runtime") == null) return null;
             return jsonNode.get("runtime").asInt();
         } catch (Exception e) {
             e.printStackTrace();
@@ -180,9 +191,7 @@ public class TheMovieDatabaseHelper {
     }
 
     public static List<ActorReceiveDto> getActorsFromExternalMovie(String idMovieFromTheMovieDatabase) {
-
         List<Integer> actorIds = getFirstFiveActorIdsFromExternalMovie(idMovieFromTheMovieDatabase);
-
         List<ActorReceiveDto> actors = new ArrayList<>();
 
         for (Integer actorId : actorIds) {
@@ -191,26 +200,36 @@ public class TheMovieDatabaseHelper {
             String actorResponseBody = getResponseBodyFromRequest(actorRequest);
 
             if (actorResponseBody != null) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                try {
-                    JsonNode actorJsonNode = objectMapper.readTree(actorResponseBody);
-
-                    // Mapear la respuesta JSON a ActorReceiveDto
-                    ActorReceiveDto actorDto = new ActorReceiveDto();
-                    actorDto.setFirstName(actorJsonNode.get("name").asText());
-                    actorDto.setLastName("");  // Si no hay apellido en la respuesta, puedes dejarlo como una cadena vacía
-                    actorDto.setBirthdate(actorJsonNode.get("birthday").asText());
-                    actorDto.setBiography(actorJsonNode.get("biography").asText());
-                    actorDto.setPhotoSrc("https://image.tmdb.org/t/p/original" + actorJsonNode.get("profile_path").asText());
-
-                    actors.add(actorDto);
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
+                ActorReceiveDto actorDto = mapActorResponse(actorResponseBody);
+                actors.add(actorDto);
             }
         }
 
         return actors;
+    }
+
+    private static ActorReceiveDto mapActorResponse(String actorResponseBody) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JsonNode actorJsonNode = objectMapper.readTree(actorResponseBody);
+
+            ActorReceiveDto actorDto = new ActorReceiveDto();
+            actorDto.setFirstName(actorJsonNode.get("name").asText());
+            actorDto.setLastName(null);
+            String birthdate = actorJsonNode.get("birthday").asText();
+            actorDto.setBirthdate("null".equals(birthdate) ? null : birthdate);
+
+            // Manejar el caso en el que "biography" es una cadena vacía
+            String biography = actorJsonNode.get("biography").asText();
+            actorDto.setBiography("".equals(biography) ? null : biography);
+
+            actorDto.setPhotoSrc(nullOrImageUrl(actorJsonNode.get("profile_path")));
+
+            return actorDto;
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 
@@ -287,9 +306,9 @@ public class TheMovieDatabaseHelper {
 
             filmReceiveDto.setTitle(jsonNode.get("title").asText());
             filmReceiveDto.setYear(DateTimeFormatterGetYears(jsonNode.get("release_date").asText()));
-            filmReceiveDto.setDuration(getDurationExternalMovie(idMovieExternal + ""));
+            filmReceiveDto.setDuration(getDurationExternalMovie(idMovieExternal));
             filmReceiveDto.setSynopsis(jsonNode.get("overview").asText());
-            filmReceiveDto.setTrailerSrc(getMovieTrailerSrcVideo(idMovieExternal + ""));
+            filmReceiveDto.setTrailerSrc(getMovieTrailerSrcVideo(idMovieExternal ));
             filmReceiveDto.setPosterSrc("https://image.tmdb.org/t/p/original" + jsonNode.get("poster_path").asText());
 
             //completamos el campo de contentRating
@@ -332,5 +351,8 @@ public class TheMovieDatabaseHelper {
 
         return null;
     }
+
+
+
 
 }

@@ -7,6 +7,7 @@ import com.tucine.cineclubadministration.Film.model.Actor;
 import com.tucine.cineclubadministration.Film.model.Award;
 import com.tucine.cineclubadministration.Film.model.Category;
 import com.tucine.cineclubadministration.Film.model.ContentRating;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,6 +38,7 @@ public class Film {
     private String posterSrc;
     @Column(name="trailer_src", nullable = false, length = 2000)
     private String trailerSrc;
+    @Nullable
     @Column(name="duration", nullable = false, length = 4)
     private int duration;
 
