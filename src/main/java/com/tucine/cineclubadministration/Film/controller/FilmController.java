@@ -105,6 +105,13 @@ public class FilmController {
         return ResponseEntity.ok(filmReceiveDto);
     }
 
+    @Transactional
+    @PostMapping("/films/saveInformationAboutFilmAndAsociateWithCineclub/{cineclubId}/{movieExternalId}")
+    public ResponseEntity<FilmDto> saveInformationAboutFilmAndAsociateWithCineclub(@RequestParam("cineclubId") Long cineclubId, @RequestParam("movieExternalId") String movieExternalId) {
+        FilmDto filmDto = filmService.saveInformationAboutFilmAndAsociateWithCineclub(cineclubId, movieExternalId);
+        return ResponseEntity.ok(filmDto);
+    }
+
     //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/films/1/categories?categoriesIds=1,2,3
     @Transactional
     @PostMapping("/films/{id}/categories")

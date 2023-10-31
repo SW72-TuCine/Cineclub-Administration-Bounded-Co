@@ -25,6 +25,8 @@ public interface FilmService{
 
     FilmReceiveDto getInformationMovieFromExternalApi(String filmExternalId);
 
+    FilmDto saveInformationAboutFilmAndAsociateWithCineclub(Long cineclubId, String movieExternalId);
+
     //Obtener películas por categoría
     List<FilmDto> getFilmsByCategory(String category);
 

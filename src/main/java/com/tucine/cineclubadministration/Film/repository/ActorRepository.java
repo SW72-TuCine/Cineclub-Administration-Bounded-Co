@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface ActorRepository extends JpaRepository<Actor,Long> {
 
     boolean existsByFirstNameAndLastName(String firstName, String lastName);
+
+    Actor findByFirstName(String firstName);
 }

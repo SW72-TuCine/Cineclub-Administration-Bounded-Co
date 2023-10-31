@@ -23,17 +23,13 @@ public class Actor {
     private Integer id;
     @Column(name = "first_name", nullable = false, length = 100)
     private String firstName;
-    @Nullable
-    @Column(name = "last_name", nullable = false, length = 100)
+    @Column(name = "last_name", nullable = true,length = 100)
     private String lastName;
-    @Nullable
-    @Column(name = "birthdate", nullable = false, length = 100)
+    @Column(name = "birthdate", nullable = true,length = 100)
     private String birthdate;
-    @Nullable
-    @Column(name = "biography", nullable = false, length = 1000)
+    @Column(name = "biography", nullable = true, length = 1000)
     private String biography;
-    @Nullable
-    @Column(name = "photo_src", nullable = false, length = 1000)
+    @Column(name = "photo_src", nullable = true,length = 1000)
     private String photoSrc;
 
     @JsonIgnore

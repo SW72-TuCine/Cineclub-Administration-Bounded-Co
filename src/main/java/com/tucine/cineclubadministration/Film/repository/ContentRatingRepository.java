@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface ContentRatingRepository extends JpaRepository<ContentRating,Long>
 {
     boolean existsByName(String name);
+
+    ContentRating findByName(String name);
 }

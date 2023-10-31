@@ -3,9 +3,6 @@ package com.tucine.cineclubadministration.Film.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 import com.tucine.cineclubadministration.Film.helpers.TheMovieDatabaseHelper;
 import com.tucine.cineclubadministration.Film.model.ExternalMovie;
 import com.tucine.cineclubadministration.Cineclub.model.Cineclub;
@@ -13,10 +10,7 @@ import com.tucine.cineclubadministration.Cineclub.repository.CineclubRepository;
 import com.tucine.cineclubadministration.Film.dto.normal.*;
 import com.tucine.cineclubadministration.Film.dto.receive.FilmReceiveDto;
 import com.tucine.cineclubadministration.Film.model.*;
-import com.tucine.cineclubadministration.Film.repository.ActorRepository;
-import com.tucine.cineclubadministration.Film.repository.AwardRepository;
-import com.tucine.cineclubadministration.Film.repository.CategoryRepository;
-import com.tucine.cineclubadministration.Film.repository.FilmRepository;
+import com.tucine.cineclubadministration.Film.repository.*;
 import com.tucine.cineclubadministration.Film.service.interf.FilmService;
 import com.tucine.cineclubadministration.shared.exception.ValidationException;
 import org.modelmapper.ModelMapper;
@@ -24,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,6 +38,8 @@ public class FilmServiceImpl implements FilmService {
     @Autowired
     private AwardRepository awardRepository;
 
+    @Autowired
+    private ContentRatingRepository contentRatingRepository;
     @Autowired
     private CineclubRepository cineclubRepository;
 
@@ -224,6 +220,101 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
+    public FilmDto saveInformationAboutFilmAndAsociateWithCineclub(Long cineclubId, String movieExternalId) {
+        // 1. Extraer toda la información de la película de la API externa
+        FilmReceiveDto filmReceiveDto = TheMovieDatabaseHelper.getInformationAboutMovieFromExternalAPI(movieExternalId);
+
+        // 2. Verificar si el ContentRating ya existe en la base de datos
+        ContentRating contentRating = contentRatingRepository.findByName(filmReceiveDto.getContentRating().getName());
+
+        // 3. Verificar si los actores ya existen en la base de datos y crearlos si no existen
+        List<Actor> actors = getOrCreateActors(filmReceiveDto.getActors());
+
+        // 4. Verificar si las categorías ya existen en la base de datos y crearlas si no existen
+        List<Category> categories = getOrCreateCategories(filmReceiveDto.getCategories());
+
+        // 5. Si el ContentRating no existe, créalo y guárdalo en la base de datos
+        if (contentRating == null) {
+            contentRating = new ContentRating();
+            contentRating.setName(filmReceiveDto.getContentRating().getName());
+            contentRating.setDescription(filmReceiveDto.getContentRating().getDescription());
+            contentRating = contentRatingRepository.save(contentRating);
+        }
+
+        // 6. Verificar si la película ya existe en la base de datos
+        Film film;
+        if (filmRepository.existsByTitleAndYearAndDuration(filmReceiveDto.getTitle(), filmReceiveDto.getYear(), filmReceiveDto.getDuration())) {
+            // Si la película existe, obtenerla de la base de datos
+            film = filmRepository.findByTitleAndYearAndDuration(filmReceiveDto.getTitle(), filmReceiveDto.getYear(), filmReceiveDto.getDuration());
+        } else {
+            // Si la película no existe, crearla y asociarla con el ContentRating y las categorías
+            FilmDto filmDto = createNewFilm(filmReceiveDto);
+            film = filmRepository.findByTitleAndYearAndDuration(filmReceiveDto.getTitle(), filmReceiveDto.getYear(), filmReceiveDto.getDuration());
+        }
+
+        // 7. Asociar la película con el ContentRating
+        film.setContentRating(contentRating);
+
+        // 8. Verificar y asociar actores y categorías con la película
+        film.setActors(getOrCreateActors(filmReceiveDto.getActors()));
+        film.setCategories(getOrCreateCategories(filmReceiveDto.getCategories()));
+
+        // 9. Obtener el cineclub de la base de datos
+        Cineclub cineclub = cineclubRepository.findById(cineclubId)
+                .orElseThrow(() -> new ValidationException("No se encontró el cineclub con el ID: " + cineclubId));
+
+        // 10. Asociar la película con el cineclub
+        if (!film.getCineclubs().contains(cineclub)) {
+            film.getCineclubs().add(cineclub);
+        }
+
+        // 11. Guardar la película
+        film = filmRepository.save(film);
+
+        // 12. Mapear y devolver la película guardada como DTO
+        return modelMapper.map(film, FilmDto.class);
+    }
+
+
+    private List<Actor> getOrCreateActors(List<Actor> actor) {
+        List<Actor> actors = new ArrayList<>();
+        for (Actor actualActor : actor) {
+            // Verificar si el actor ya existe en la base de datos
+            Actor existingActor = actorRepository.findByFirstName(actualActor.getFirstName());
+            if (existingActor != null) {
+                actors.add(existingActor);
+            } else {
+                // Si el actor no existe, crearlo y guardarlo en la base de datos
+                Actor newActor = new Actor();
+                newActor.setFirstName(actualActor.getFirstName());
+                newActor.setLastName(actualActor.getLastName());
+                newActor.setBirthdate(actualActor.getBirthdate());
+                newActor.setBiography(actualActor.getBiography());
+                newActor.setPhotoSrc(actualActor.getPhotoSrc());
+                actors.add(actorRepository.save(newActor));
+            }
+        }
+        return actors;
+    }
+
+    private List<Category> getOrCreateCategories(List<Category> category) {
+        List<Category> categories = new ArrayList<>();
+
+        for (Category actualCategory : category) {
+            // Verificar si la categoría ya existe en la base de datos
+            Category existingCategory = categoryRepository.findByName(actualCategory.getName());
+            if (existingCategory != null) {
+                categories.add(existingCategory);
+            } else {
+                // Si la categoría no existe, crearla y guardarla en la base de datos
+                Category newCategory = new Category();
+                newCategory.setName(actualCategory.getName());
+                categories.add(categoryRepository.save(newCategory));
+            }
+        }
+        return categories;
+    }
+    @Override
     public List<FilmDto> getFilmsByCategory(String category) {
 
         if(!categoryRepository.existsByName(category)){
@@ -360,15 +451,15 @@ public class FilmServiceImpl implements FilmService {
         if(filmReceiveDto.getTitle() == null || filmReceiveDto.getTitle().isEmpty()){
             throw new ValidationException("El título de la película no puede estar vacío");
         }
-        if(filmReceiveDto.getDuration() <= 0){
+/*        if(filmReceiveDto.getDuration() <= 0){
             throw new ValidationException("La duración de la película no puede ser menor o igual a 0");
-        }
-        if(filmReceiveDto.getSynopsis() == null || filmReceiveDto.getSynopsis().isEmpty()){
+        }*/
+/*        if(filmReceiveDto.getSynopsis() == null || filmReceiveDto.getSynopsis().isEmpty()){
             throw new ValidationException("La sinopsis de la película no puede estar vacía");
-        }
-        if(filmReceiveDto.getPosterSrc() == null || filmReceiveDto.getPosterSrc().isEmpty()){
+        }*/
+/*        if(filmReceiveDto.getPosterSrc() == null || filmReceiveDto.getPosterSrc().isEmpty()){
             throw new ValidationException("La ruta del poster de la película no puede estar vacía");
-        }
+        }*/
 /*        if(filmReceiveDto.getTrailerSrc() == null || filmReceiveDto.getTrailerSrc().isEmpty()){
             throw new RuntimeException("La ruta del trailer de la película no puede estar vacía");
         }*/

@@ -231,8 +231,6 @@ public class TheMovieDatabaseHelper {
             return null;
         }
     }
-
-
     public static String getStringResponseForSearchFilmAPI(String title) {
 
         //Es esto necesario?
@@ -313,12 +311,15 @@ public class TheMovieDatabaseHelper {
 
             //completamos el campo de contentRating
             ContentRating contentRating = new ContentRating();
-            contentRating.setName(getContentRatingNameFromExternalMovie(idMovieExternal + ""));
+            contentRating.setName(getContentRatingNameFromExternalMovie(idMovieExternal));
+            if(contentRating.getName() == null){
+                contentRating.setName("NN");
+            }
             filmReceiveDto.setContentRating(contentRating);
             //filmReceiveDto.setContentRating(getContentRatingNameFromExternalMovie(idMovieExternal + ""));
 
             //completamos el campo de actors
-            List<ActorReceiveDto> listActors = getActorsFromExternalMovie(idMovieExternal + "");
+            List<ActorReceiveDto> listActors = getActorsFromExternalMovie(idMovieExternal);
 
             ModelMapper modelMapper = new ModelMapper();
 
@@ -351,6 +352,7 @@ public class TheMovieDatabaseHelper {
 
         return null;
     }
+
 
 
 
