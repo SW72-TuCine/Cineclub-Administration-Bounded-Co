@@ -3,6 +3,7 @@ package com.tucine.cineclubadministration.Film.helpers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -197,6 +198,65 @@ public class TheMovieDatabaseHelper {
         }
 
         return actors;
+    }
+
+
+    public static String getStringResponseForSearchFilmAPI(String title){
+
+        //Es esto necesario?
+        OkHttpClient client = new OkHttpClient();
+
+        String URL="https://api.themoviedb.org/3/search/movie?query="+title+"&include_adult=false&language=es-EP&page=1";
+
+        Request request= requestBuilder(URL,API_KEY);
+
+        return getResponseBodyFromRequest(request);
+    }
+
+    private static String getStringResponseAllCategoriesFromExternalMovieAPI(){
+
+        OkHttpClient client = new OkHttpClient();
+
+        String URL= "https://api.themoviedb.org/3/genre/movie/list?language=es";
+
+        Request request= requestBuilder(URL,API_KEY);
+
+        return getResponseBodyFromRequest(request);
+    }
+
+    public static List<String> getAllCategoriesFromExternalMovieAPI(List<Integer> listCategoryIdExternalAPI){
+
+        //supongo que aquí faltaría delimitar cuantas películas va a devolver o algo así para que no sea tan pesado
+
+        String jsonResponse = getStringResponseAllCategoriesFromExternalMovieAPI();
+
+        //Crear una lista para almacenar las categorias
+        List<String > ListCategoriesFromMovie = new java.util.ArrayList<>(Collections.emptyList());
+
+        try{
+            //Configurar el ObjectMapper de Jackson
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            //Parsear el JSON a un nodo JSON
+            JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+
+            //Obtener la matriz "results" del nodo JSON
+            ArrayNode resultsArrayNode = (ArrayNode) jsonNode.get("genres");
+
+            for(JsonNode genre: resultsArrayNode){
+                int idExternalMovie= genre.get("id").asInt();
+
+                if(listCategoryIdExternalAPI.contains(idExternalMovie)){
+                    String nameCategory = genre.get("name").asText();
+                    ListCategoriesFromMovie.add(nameCategory);
+                }
+            }
+
+            return ListCategoriesFromMovie;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

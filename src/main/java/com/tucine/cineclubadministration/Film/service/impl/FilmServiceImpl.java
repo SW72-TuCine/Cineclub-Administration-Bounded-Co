@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.tucine.cineclubadministration.Film.helpers.TheMovieDatabaseHelper;
 import com.tucine.cineclubadministration.Film.model.ExternalMovie;
 import com.tucine.cineclubadministration.Cineclub.model.Cineclub;
 import com.tucine.cineclubadministration.Cineclub.repository.CineclubRepository;
@@ -149,7 +150,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<ExternalMovie> searchFilmInExternalApi(String title) {
 
-        String jsonResponse = getStringResponseForSearchFilmAPI(title);
+        String jsonResponse = TheMovieDatabaseHelper.getStringResponseForSearchFilmAPI(title);
 
         //Crear una lista para almacenar los objetos ExternalMovie
         List<ExternalMovie> ListExternalMovie = new java.util.ArrayList<>(Collections.emptyList());
@@ -180,7 +181,7 @@ public class FilmServiceImpl implements FilmService {
                 for(JsonNode genre: movieNode.get("genre_ids")){
                     listCategoryIdExternalAPI.add(genre.asInt());
                 }
-                List<String> listCategories = getAllCategoriesFromExternalMovieAPI(listCategoryIdExternalAPI);
+                List<String> listCategories = TheMovieDatabaseHelper.getAllCategoriesFromExternalMovieAPI(listCategoryIdExternalAPI);
                 externalMovie.setGenres(listCategories);
 
                 //Se agrega el objeto a la lista
@@ -198,99 +199,7 @@ public class FilmServiceImpl implements FilmService {
         return null;
     }
 
-    private List<String> getAllCategoriesFromExternalMovieAPI(List<Integer> listCategoryIdExternalAPI){
 
-        //supongo que aquí faltaría delimitar cuantas películas va a devolver o algo así para que no sea tan pesado
-
-        String jsonResponse = getStringResponseAllCategoriesFromExternalMovieAPI();
-
-        //Crear una lista para almacenar las categorias
-        List<String > ListCategoriesFromMovie = new java.util.ArrayList<>(Collections.emptyList());
-
-        try{
-            //Configurar el ObjectMapper de Jackson
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            //Parsear el JSON a un nodo JSON
-            JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-
-            //Obtener la matriz "results" del nodo JSON
-            ArrayNode resultsArrayNode = (ArrayNode) jsonNode.get("genres");
-
-            for(JsonNode genre: resultsArrayNode){
-                int idExternalMovie= genre.get("id").asInt();
-
-                if(listCategoryIdExternalAPI.contains(idExternalMovie)){
-                    String nameCategory = genre.get("name").asText();
-                    ListCategoriesFromMovie.add(nameCategory);
-                }
-            }
-
-            return ListCategoriesFromMovie;
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        return null;
-    }
-    private String getStringResponseForSearchFilmAPI(String title){
-
-        //Es esto necesario?
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .url("https://api.themoviedb.org/3/search/movie?query="+title+"&include_adult=false&language=es-EP&page=1")
-                .get()
-                .addHeader("accept", "application/json")
-                .addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxMjhjMjQ4YWEwNTMwOGIzMDUyYWZiNWQ4MzU1NmY2ZSIsInN1YiI6IjY1MGI5NTdmMmM2YjdiMDBmZTQ1YjY5YyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zQL9P8NaXE9qwDIWk3Jzgc0m0R7QqjFdBiXQl0k3AXs")
-                .build();
-
-        try{
-            Response response = client.newCall(request).execute();
-
-            if(response.isSuccessful()){
-                String responseBody = response.body().string();
-                return responseBody;
-
-            }else{
-                return "Respuesta no es exitosa";
-            }
-
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-        return "Respuesta no es exitosa";
-    }
-    private String getStringResponseAllCategoriesFromExternalMovieAPI(){
-
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .url("https://api.themoviedb.org/3/genre/movie/list?language=es")
-                .get()
-                .addHeader("accept", "application/json")
-                .addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxMjhjMjQ4YWEwNTMwOGIzMDUyYWZiNWQ4MzU1NmY2ZSIsInN1YiI6IjY1MGI5NTdmMmM2YjdiMDBmZTQ1YjY5YyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zQL9P8NaXE9qwDIWk3Jzgc0m0R7QqjFdBiXQl0k3AXs")
-                .build();
-
-        try {
-            Response response = client.newCall(request).execute();
-
-            if(response.isSuccessful()){
-                String responseBody = response.body().string();
-                return responseBody;
-            }else{
-                return "Respuesta no es exitosa";
-            }
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return "Respuesta no es exitosa";
-
-
-    }
 
     @Override
     public List<FilmDto> searchExistingFilm(String title) {
