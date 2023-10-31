@@ -14,6 +14,7 @@ import com.tucine.cineclubadministration.Film.dto.normal.ActorDto;
 import com.tucine.cineclubadministration.Film.dto.receive.ActorReceiveDto;
 import com.tucine.cineclubadministration.Film.dto.receive.FilmReceiveDto;
 import com.tucine.cineclubadministration.Film.model.Actor;
+import com.tucine.cineclubadministration.Film.model.Category;
 import com.tucine.cineclubadministration.Film.model.ContentRating;
 import org.modelmapper.ModelMapper;
 import org.springframework.ui.ModelMap;
@@ -321,6 +322,7 @@ public class TheMovieDatabaseHelper {
             //completamos el campo de contentRating
             ContentRating contentRating = new ContentRating();
             contentRating.setName(getContentRatingNameFromExternalMovie(idMovieExternal + ""));
+            filmReceiveDto.setContentRating(contentRating);
             //filmReceiveDto.setContentRating(getContentRatingNameFromExternalMovie(idMovieExternal + ""));
 
             //completamos el campo de actors
@@ -336,13 +338,17 @@ public class TheMovieDatabaseHelper {
             }
             filmReceiveDto.setActors(actors);
 
+
+            List<Category> categories = new ArrayList<>();
             //completamos el campo de categories
             List<Integer> listCategoryIdExternalAPI = new ArrayList<>();
             for (JsonNode genre : jsonNode.get("genres")) {
                 listCategoryIdExternalAPI.add(genre.get("id").asInt());
-                System.out.println(genre.get("id").asInt());
-                System.out.println(genre.get("name").asText());
+                Category category = new Category();
+                category.setName(genre.get("name").asText());
+                categories.add(category);
             }
+            filmReceiveDto.setCategories(categories);
             //filmReceiveDto.setCategories(getAllCategoriesFromExternalMovieAPI(listCategoryIdExternalAPI));
 
             return filmReceiveDto;
