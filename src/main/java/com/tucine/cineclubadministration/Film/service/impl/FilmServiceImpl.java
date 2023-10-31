@@ -219,6 +219,11 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
+    public FilmReceiveDto getInformationMovieFromExternalApi(String filmExternalId) {
+        return TheMovieDatabaseHelper.getInformationAboutMovieFromExternalAPI(filmExternalId);
+    }
+
+    @Override
     public List<FilmDto> getFilmsByCategory(String category) {
 
         if(!categoryRepository.existsByName(category)){

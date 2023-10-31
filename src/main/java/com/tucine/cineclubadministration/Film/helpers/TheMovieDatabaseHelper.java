@@ -85,6 +85,8 @@ public class TheMovieDatabaseHelper {
             JsonNode jsonNode = objectMapper.readTree(responseBody);
             //Obtener el primer elemento del arreglo results:
             JsonNode firstResult = jsonNode.get("results").get(0);
+
+            
             String video_youtube_key = firstResult.get("key").asText();
             return youtube_link + video_youtube_key;
         } catch (Exception e) {
@@ -272,36 +274,7 @@ public class TheMovieDatabaseHelper {
 
     public static FilmReceiveDto getInformationAboutMovieFromExternalAPI(String idMovieExternal) {
 
-        //Necesitamos lo siguiente:
-        //String title
-        //String year
-        //String duration
-        //String synopsis
-        //String trailerSrc
-        //String posterSrc
-        //Int duration
 
-        //ContentRating contentRating (deberiamos llamar a la base de datos para que nos rellene todo)?
-        //      String name
-        //      String description
-
-        //List<Actor>actors:
-        //  Actor:
-        //      String firstName
-        //      String lastName
-        //      String birthdate
-        //      String biography
-        //      String photoSrc
-
-        //List<Category> categories:
-        //  Category:
-        //      String name
-        //Lista de films asociados a la categoria
-
-        //Como solo llamararemos a esto para mostrar la información , no es necesaria guardarla , solo se debe guardar si
-        // el administrador desea guardar la película y asociarla a su cineclub
-
-        //1ero llamamos a la API para obtener la información de la película
         String URL = "https://api.themoviedb.org/3/movie/" + idMovieExternal + "?language=" + DEFAULT_LANGUAGE;
         String jsonResponse = getResponseBodyFromRequest(requestBuilder(URL, API_KEY));
 

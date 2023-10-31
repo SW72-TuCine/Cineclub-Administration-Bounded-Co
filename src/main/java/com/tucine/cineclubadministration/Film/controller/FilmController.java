@@ -97,6 +97,14 @@ public class FilmController {
         return ResponseEntity.ok(awards);
     }
 
+    // URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/films/externalApi/{filmExternalId}
+    @Transactional(readOnly = true)
+    @GetMapping("/films/externalApi/{filmExternalId}")
+    public ResponseEntity<FilmReceiveDto> getInformationMovieFromExternalApi(@PathVariable("filmExternalId") String filmExternalId) {
+        FilmReceiveDto filmReceiveDto = filmService.getInformationMovieFromExternalApi(filmExternalId);
+        return ResponseEntity.ok(filmReceiveDto);
+    }
+
     //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/films/1/categories?categoriesIds=1,2,3
     @Transactional
     @PostMapping("/films/{id}/categories")

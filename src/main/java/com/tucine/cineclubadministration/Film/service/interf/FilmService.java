@@ -23,6 +23,8 @@ public interface FilmService{
     List<ExternalMovie> searchFilmInExternalApi(String title);
     List<FilmDto> searchExistingFilm(String title);
 
+    FilmReceiveDto getInformationMovieFromExternalApi(String filmExternalId);
+
     //Obtener películas por categoría
     List<FilmDto> getFilmsByCategory(String category);
 
