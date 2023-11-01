@@ -239,7 +239,7 @@ public class TheMovieDatabaseHelper {
         //Es esto necesario?
         OkHttpClient client = new OkHttpClient();
 
-        String URL = "https://api.themoviedb.org/3/search/movie?query=" + title + "&include_adult=false&language=es-EP&page=1";
+        String URL = "https://api.themoviedb.org/3/search/movie?query=" + title + "&include_adult=false&language=es-PE&page=1";
 
         Request request = requestBuilder(URL, API_KEY);
 
@@ -309,7 +309,7 @@ public class TheMovieDatabaseHelper {
             filmReceiveDto.setYear(DateTimeFormatterGetYears(jsonNode.get("release_date").asText()));
             filmReceiveDto.setDuration(getDurationExternalMovie(idMovieExternal));
             filmReceiveDto.setSynopsis(jsonNode.get("overview").asText());
-            filmReceiveDto.setTrailerSrc(getMovieTrailerSrcVideo(idMovieExternal ));
+            filmReceiveDto.setTrailerSrc(getMovieTrailerSrcVideo(idMovieExternal));
             filmReceiveDto.setPosterSrc("https://image.tmdb.org/t/p/original" + jsonNode.get("poster_path").asText());
 
             //completamos el campo de contentRating

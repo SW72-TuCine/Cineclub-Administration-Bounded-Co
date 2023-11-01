@@ -35,7 +35,7 @@ public class FilmController {
 
     // URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/films/{filmId}
     @Transactional
-    @GetMapping("/films/{id}")
+    @GetMapping("/films/getById/{id}")
     public ResponseEntity<FilmDto> getFilmById(@PathVariable("id") Long filmId) {
         FilmDto filmDto = filmService.getFilmById(filmId);
         return ResponseEntity.ok(filmDto);
@@ -107,7 +107,7 @@ public class FilmController {
 
     @Transactional
     @PostMapping("/films/saveInformationAboutFilmAndAsociateWithCineclub/{cineclubId}/{movieExternalId}")
-    public ResponseEntity<FilmDto> saveInformationAboutFilmAndAsociateWithCineclub(@RequestParam("cineclubId") Long cineclubId, @RequestParam("movieExternalId") String movieExternalId) {
+    public ResponseEntity<FilmDto> saveInformationAboutFilmAndAsociateWithCineclub(@PathVariable ("cineclubId") Long cineclubId, @PathVariable ("movieExternalId") String movieExternalId) {
         FilmDto filmDto = filmService.saveInformationAboutFilmAndAsociateWithCineclub(cineclubId, movieExternalId);
         return ResponseEntity.ok(filmDto);
     }
