@@ -76,24 +76,6 @@ public class FilmServiceImpl implements FilmService {
         Film film = DtoToEntity(filmDto);
 
         return EntityToDto(filmRepository.save(film));
-
-
-/*        validateFilm(filmReceiveDto);
-
-        FilmDto filmDto = modelMapper.map(filmReceiveDto, FilmDto.class);
-
-        Film film = DtoToEntity(filmDto);
-
-        // Asocia actores, premios y categorías según sus IDs
-        film.setActors(getEntitiesByIds(filmReceiveDto.getActorIds(), actorRepository));
-        film.setAwards(getEntitiesByIds(filmReceiveDto.getAwardIds(), awardRepository));
-        film.setCategories(getEntitiesByIds(filmReceiveDto.getCategoryIds(), categoryRepository));
-
-        // Guarda la película en la base de datos
-        Film savedFilm = filmRepository.save(film);
-
-        // Mapea y devuelve la película guardada como DTO
-        return EntityToDto(savedFilm);*/
     }
 
     private <T> List<T> getEntitiesByIds(List<Long> ids, JpaRepository<T, Long> repository) {
@@ -221,28 +203,32 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public FilmDto saveInformationAboutFilmAndAsociateWithCineclub(Long cineclubId, String movieExternalId) {
-        // 1. Extraer toda la información de la película de la API externa
+
+        // 1. Verificar/Obtener el cineclub de la base de datos
+        Cineclub cineclub = cineclubRepository.findById(cineclubId)
+                .orElseThrow(() -> new ValidationException("No se encontró el cineclub con el ID: " + cineclubId));
+
+        // 2. Extraer toda la información de la película de la API externa
         FilmReceiveDto filmReceiveDto = TheMovieDatabaseHelper.getInformationAboutMovieFromExternalAPI(movieExternalId);
 
-        // 2. Verificar si el ContentRating ya existe en la base de datos
+        // 3. Verificar si el ContentRating ya existe en la base de datos
         ContentRating contentRating = contentRatingRepository.findByName(filmReceiveDto.getContentRating().getName());
 
-        // 3. Verificar si los actores ya existen en la base de datos y crearlos si no existen
+        // 4. Verificar si los actores ya existen en la base de datos y crearlos si no existen
         List<Actor> actors = getOrCreateActors(filmReceiveDto.getActors());
 
-        // 4. Verificar si las categorías ya existen en la base de datos y crearlas si no existen
+        // 5. Verificar si las categorías ya existen en la base de datos y crearlas si no existen
         List<Category> categories = getOrCreateCategories(filmReceiveDto.getCategories());
 
-        // 5. Si el ContentRating no existe, créalo y guárdalo en la base de datos
-        if (contentRating == null) {
-            contentRating = new ContentRating();
-            contentRating.setName(filmReceiveDto.getContentRating().getName());
-            contentRating.setDescription(filmReceiveDto.getContentRating().getDescription());
-            contentRating = contentRatingRepository.save(contentRating);
-        }
+        //filmReceiveDto
+        filmReceiveDto.setContentRating(contentRating);
+        filmReceiveDto.setActors(actors);
+        filmReceiveDto.setCategories(categories);
 
-        // 6. Verificar si la película ya existe en la base de datos
-        Film film;
+        // 6. Instanciar una pelicula
+        Film film= new Film();
+
+        //Verificar si la película ya existe en la base de datos
         if (filmRepository.existsByTitleAndYearAndDuration(filmReceiveDto.getTitle(), filmReceiveDto.getYear(), filmReceiveDto.getDuration())) {
             // Si la película existe, obtenerla de la base de datos
             film = filmRepository.findByTitleAndYearAndDuration(filmReceiveDto.getTitle(), filmReceiveDto.getYear(), filmReceiveDto.getDuration());
@@ -252,33 +238,29 @@ public class FilmServiceImpl implements FilmService {
             film = filmRepository.findByTitleAndYearAndDuration(filmReceiveDto.getTitle(), filmReceiveDto.getYear(), filmReceiveDto.getDuration());
         }
 
-        // 7. Asociar la película con el ContentRating
-        film.setContentRating(contentRating);
-
-        // 8. Verificar y asociar actores y categorías con la película
-        film.setActors(getOrCreateActors(filmReceiveDto.getActors()));
-        film.setCategories(getOrCreateCategories(filmReceiveDto.getCategories()));
-
-        // 9. Obtener el cineclub de la base de datos
-        Cineclub cineclub = cineclubRepository.findById(cineclubId)
-                .orElseThrow(() -> new ValidationException("No se encontró el cineclub con el ID: " + cineclubId));
-
-        // 10. Asociar la película con el cineclub
+        if(film.getCineclubs()==null){
+            film.setCineclubs(new ArrayList<>());
+        }
+        if(cineclub.getFilms()==null){
+            cineclub.setFilms(new ArrayList<>());
+        }
+        // 9. Asociar la película con el cineclub
         if (!film.getCineclubs().contains(cineclub)) {
             film.getCineclubs().add(cineclub);
+            cineclub.getFilms().add(film);
         }
 
-        // 11. Guardar la película
+        // 10. Guardar la película
         film = filmRepository.save(film);
 
-        // 12. Mapear y devolver la película guardada como DTO
+        // 11. Mapear y devolver la película guardada como DTO
         return modelMapper.map(film, FilmDto.class);
     }
 
 
-    private List<Actor> getOrCreateActors(List<Actor> actor) {
+    private List<Actor> getOrCreateActors(List<Actor> actorsToCreate) {
         List<Actor> actors = new ArrayList<>();
-        for (Actor actualActor : actor) {
+        for (Actor actualActor : actorsToCreate) {
             // Verificar si el actor ya existe en la base de datos
             Actor existingActor = actorRepository.findByFirstName(actualActor.getFirstName());
             if (existingActor != null) {
@@ -287,15 +269,36 @@ public class FilmServiceImpl implements FilmService {
                 // Si el actor no existe, crearlo y guardarlo en la base de datos
                 Actor newActor = new Actor();
                 newActor.setFirstName(actualActor.getFirstName());
-                newActor.setLastName(actualActor.getLastName());
-                newActor.setBirthdate(actualActor.getBirthdate());
-                newActor.setBiography(actualActor.getBiography());
-                newActor.setPhotoSrc(actualActor.getPhotoSrc());
+                if (actualActor.getLastName() == null) {
+                    newActor.setLastName("");
+                }else {
+                    newActor.setLastName(actualActor.getLastName());
+                }
+                if(actualActor.getBirthdate() == null){
+                    newActor.setBirthdate("");
+                }else
+                {
+                    newActor.setBirthdate(actualActor.getBirthdate());
+                }
+                // Verificar si la biografía está presente y establecer un valor predeterminado si no lo está
+                if (actualActor.getBiography() != null) {
+                    newActor.setBiography(actualActor.getBiography());
+                } else {
+                    newActor.setBiography("Biografía no disponible");
+                }
+                if(actualActor.getPhotoSrc() == null){
+                    newActor.setPhotoSrc("");
+                }else
+                {
+                    newActor.setPhotoSrc(actualActor.getPhotoSrc());
+                }
+
                 actors.add(actorRepository.save(newActor));
             }
         }
         return actors;
     }
+
 
     private List<Category> getOrCreateCategories(List<Category> category) {
         List<Category> categories = new ArrayList<>();

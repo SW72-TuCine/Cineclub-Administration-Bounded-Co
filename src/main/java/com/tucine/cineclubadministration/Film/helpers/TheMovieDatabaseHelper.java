@@ -90,11 +90,12 @@ public class TheMovieDatabaseHelper {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(responseBody);
-            //Obtener el primer elemento del arreglo results:
+            // Obtener el primer elemento del arreglo results:
             JsonNode firstResult = jsonNode.get("results").get(0);
 
             if(firstResult == null){
-                return null;
+                // Si no hay trailer disponible, asignar un valor predeterminado
+                return "Trailer no disponible";
             }
 
             String video_youtube_key = firstResult.get("key").asText();
@@ -102,8 +103,10 @@ public class TheMovieDatabaseHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        // Si hay un error o no se encuentra el trailer, asignar un valor predeterminado
+        return "Trailer no disponible";
     }
+
 
     public static Integer getDurationExternalMovie(String idMovieFromTheMovieDatabase) {
 
