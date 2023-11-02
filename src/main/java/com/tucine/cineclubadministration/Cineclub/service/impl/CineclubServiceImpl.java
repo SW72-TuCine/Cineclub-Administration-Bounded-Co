@@ -73,11 +73,17 @@ public class CineclubServiceImpl implements CineclubService {
         validateCineclub(cineclubReceiveDto);
         existCineclubByName(cineclubReceiveDto.getName());
 
+
         CineclubDto cineclubDto = modelMapper.map(cineclubReceiveDto, CineclubDto.class);
         Cineclub cineclub = DtoToEntity(cineclubDto);
+        cineclub.setFilms(cineclubReceiveDto.getFilms());
 
         return EntityToDto(cineclubRepository.save(cineclub));
     }
+
+
+
+
     private void validateUserExistsAndItsBUSINESS(String idClient) {
         try {
             ResponseEntity<UserResponse> userResponse = userClient.getUserById(Long.valueOf(idClient));
@@ -140,6 +146,10 @@ public class CineclubServiceImpl implements CineclubService {
         if (cineclubReceiveDto.getDescription() != null && !cineclubReceiveDto.getDescription().isEmpty()) {
             existingCineclub.setDescription(cineclubReceiveDto.getDescription());
         }
+        if (cineclubReceiveDto.getOwnerId() != null) {
+            existingCineclub.setOwnerId(cineclubReceiveDto.getOwnerId());
+        }
+
 
         Cineclub updatedCineclub = cineclubRepository.save(existingCineclub);
 
@@ -196,6 +206,12 @@ public class CineclubServiceImpl implements CineclubService {
 
         // Guardar los cambios en la base de datos
         Cineclub updatedCineclub = cineclubRepository.save(existingCineclub);
+
+        //Agregar el cineclub a la lista de cineclubs de la película
+        existingFilm.getCineclubs().add(updatedCineclub);
+
+        //Guardar los cambios en la base de datos
+        Film updatedFilm = filmRepository.save(existingFilm);
 
         // Devolver el cineclub modificado
         return EntityToDto(updatedCineclub);

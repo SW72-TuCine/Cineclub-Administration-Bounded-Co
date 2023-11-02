@@ -423,7 +423,13 @@ public class FilmServiceImpl implements FilmService {
             film.getCineclubs().add(cineclub);
         }
 
+        if(!cineclub.getFilms().contains(film)){
+            cineclub.getFilms().add(film);
+        }
+
         film = filmRepository.save(film);
+
+        cineclubRepository.save(cineclub);
 
         return modelMapper.map(film, FilmDto.class);
     }
@@ -448,7 +454,6 @@ public class FilmServiceImpl implements FilmService {
 
         return modelMapper.map(film, FilmDto.class);
     }
-
 
     private void validateFilm(FilmReceiveDto filmReceiveDto) {
         if(filmReceiveDto.getTitle() == null || filmReceiveDto.getTitle().isEmpty()){
