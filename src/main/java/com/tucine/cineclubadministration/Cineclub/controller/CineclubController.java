@@ -7,7 +7,9 @@ import com.tucine.cineclubadministration.Cineclub.dto.receive.CineclubReceiveDto
 import com.tucine.cineclubadministration.Cineclub.service.interf.CineclubService;
 import com.tucine.cineclubadministration.Film.dto.normal.FilmDto;
 import com.tucine.cineclubadministration.Film.model.Film;
+import com.tucine.cineclubadministration.shared.exception.ErrorMessage;
 import com.tucine.cineclubadministration.shared.exception.ValidationException;
+import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +24,8 @@ public class CineclubController {
 
     @Autowired
     private CineclubService cineclubService;
-/*    @Autowired
-    private UserClient userClient;*/
+    @Autowired
+    private UserClient userClient;
 
     // URL: http://localhost:8080/api/TuCine/V1/cineclubs
     // Method: GET
@@ -50,7 +52,13 @@ public class CineclubController {
     }
 
     private ResponseEntity<?> fallbackToUserService(CineclubReceiveDto cineclubReceiveDto, Throwable throwable){
-        String errorMessage = "User service is not available";
+        
+        String errorMessage = "Error occurred while calling User service";
+
+        // Si el error es de tipo FeignException, puedes obtener el mensaje de error original
+        if (throwable instanceof FeignException) {
+            errorMessage = ((FeignException) throwable).contentUTF8();
+        }
 
         //If the minimum-number-of-calls is reached, the circuit breaker will be OPEN and show this error message
         if (throwable instanceof io.github.resilience4j.circuitbreaker.CallNotPermittedException){

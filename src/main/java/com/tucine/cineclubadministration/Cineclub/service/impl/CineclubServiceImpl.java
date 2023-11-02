@@ -1,30 +1,36 @@
 package com.tucine.cineclubadministration.Cineclub.service.impl;
 
+//import com.tucine.cineclubadministration.Cineclub.client.UserClient;
 import com.tucine.cineclubadministration.Cineclub.client.UserClient;
 import com.tucine.cineclubadministration.Cineclub.dto.normal.CineclubDto;
 import com.tucine.cineclubadministration.Cineclub.dto.receive.CineclubReceiveDto;
 import com.tucine.cineclubadministration.Cineclub.model.Cineclub;
-import com.tucine.cineclubadministration.Cineclub.model.CineclubType;
 import com.tucine.cineclubadministration.Cineclub.repository.CineclubRepository;
 import com.tucine.cineclubadministration.Cineclub.service.interf.CineclubService;
 import com.tucine.cineclubadministration.Film.dto.normal.FilmDto;
-import com.tucine.cineclubadministration.Film.model.Category;
 import com.tucine.cineclubadministration.Film.model.Film;
 import com.tucine.cineclubadministration.Film.repository.FilmRepository;
+import com.tucine.cineclubadministration.shared.response.TypeUsers;
+import com.tucine.cineclubadministration.shared.response.UserResponse;
 import com.tucine.cineclubadministration.shared.exception.ValidationException;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class CineclubServiceImpl implements CineclubService {
+
 
     @Autowired
     private CineclubRepository cineclubRepository;
@@ -34,10 +40,11 @@ public class CineclubServiceImpl implements CineclubService {
 
     @Autowired
     private ModelMapper modelMapper;
+/*    @Autowired
+    private UserClient userClient;*/
 
     @Autowired
     private UserClient userClient;
-
     @Override
     public List<CineclubDto> getAllCineclubs() {
         List<Cineclub> cineclubs = cineclubRepository.findAll();
@@ -58,10 +65,11 @@ public class CineclubServiceImpl implements CineclubService {
 
     @Override
     public CineclubDto createCineclub(CineclubReceiveDto cineclubReceiveDto) {
-        if (!userClient.checkIfUserExist(cineclubReceiveDto.getOwnerId())) {
-            throw new ValidationException("User does not exist");
-        }
 
+
+        String idClient = cineclubReceiveDto.getOwnerId().toString();
+
+        validateUserExistsAndItsBUSINESS(idClient);
         validateCineclub(cineclubReceiveDto);
         existCineclubByName(cineclubReceiveDto.getName());
 
@@ -70,7 +78,18 @@ public class CineclubServiceImpl implements CineclubService {
 
         return EntityToDto(cineclubRepository.save(cineclub));
     }
+    private void validateUserExistsAndItsBUSINESS(String idClient) {
+        try {
+            ResponseEntity<UserResponse> userResponse = userClient.getUserById(Long.valueOf(idClient));
 
+            if(userResponse.getBody().getTypeUser().getName() != TypeUsers.BUSINESS){
+                throw new ValidationException("El usuario no es un negocio");
+            }
+
+        } catch (FeignException feignException) {
+            throw new ValidationException(feignException.getMessage());
+        }
+    }
     @Override
     public CineclubDto modifyCineclub(Long cineclubId, CineclubReceiveDto cineclubReceiveDto) {
         Cineclub existingCineclub = cineclubRepository.findById(cineclubId)
@@ -109,7 +128,7 @@ public class CineclubServiceImpl implements CineclubService {
         if (cineclubReceiveDto.getFilms() != null && !cineclubReceiveDto.getFilms().isEmpty()) {
             existingCineclub.setFilms(cineclubReceiveDto.getFilms());
         }
-        if (cineclubReceiveDto.getOpenInHours() != null && !cineclubReceiveDto.getOpenInHours().toString().isEmpty()) {
+        if (cineclubReceiveDto.getOpenInHours() != null && !cineclubReceiveDto.getOpenInHours().isEmpty()) {
             existingCineclub.setOpenInHours(cineclubReceiveDto.getOpenInHours());
         }
         if (cineclubReceiveDto.getCineclubType() != null) {

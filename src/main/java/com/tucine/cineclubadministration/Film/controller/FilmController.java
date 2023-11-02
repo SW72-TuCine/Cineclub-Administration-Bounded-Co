@@ -4,7 +4,7 @@ import com.tucine.cineclubadministration.Film.dto.normal.*;
 import com.tucine.cineclubadministration.Film.dto.receive.FilmReceiveDto;
 import com.tucine.cineclubadministration.Film.model.ExternalMovie;
 import com.tucine.cineclubadministration.Film.service.interf.FilmService;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+//import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -148,7 +148,7 @@ public class FilmController {
     @Transactional(readOnly = true)
     @GetMapping("/films/search/externalApi")
 
-    @CircuitBreaker(name = "externalApi", fallbackMethod = "searchFilmInExternalAPIFallback")
+    //@CircuitBreaker(name = "externalApi", fallbackMethod = "searchFilmInExternalAPIFallback")
     public ResponseEntity<List<ExternalMovie>> searchFilmInExternalAPI(@RequestParam("title") String title) {
         try {
             // Intenta llamar al servicio externo

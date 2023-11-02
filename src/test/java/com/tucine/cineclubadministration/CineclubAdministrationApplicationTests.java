@@ -2,12 +2,15 @@ package com.tucine.cineclubadministration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.tucine.cineclubadministration.Cineclub.service.impl.CineclubServiceImpl;
 import com.tucine.cineclubadministration.Film.dto.receive.ActorReceiveDto;
 import com.tucine.cineclubadministration.Film.dto.receive.FilmReceiveDto;
 import com.tucine.cineclubadministration.Film.helpers.TheMovieDatabaseHelper;
 import com.tucine.cineclubadministration.Film.service.impl.FilmServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
@@ -62,6 +65,12 @@ class CineclubAdministrationApplicationTests {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+	}
+
+	@Test
+	void Test8(){
+
 
 	}
 
