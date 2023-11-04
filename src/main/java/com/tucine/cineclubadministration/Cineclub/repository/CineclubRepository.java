@@ -15,4 +15,6 @@ public interface CineclubRepository extends JpaRepository<Cineclub, Long> {
 
     List<Cineclub> getAllByNameContains(String cineclubName);
     Cineclub findByName(String name);
+
+    boolean existsById(Long id);
 }
