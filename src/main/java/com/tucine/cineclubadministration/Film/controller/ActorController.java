@@ -17,7 +17,7 @@ public class ActorController {
     @Autowired
     private ActorService actorService;
 
-    //URL: http://localhost:8080/api/TuCine/v1/actors
+    //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/actors
     //Method: GET
     @Transactional(readOnly = true)
     @GetMapping("/actors")
@@ -25,7 +25,7 @@ public class ActorController {
         return new ResponseEntity<>(actorService.getAllActors(), org.springframework.http.HttpStatus.OK);
     }
 
-    //URL: http://localhost:8080/api/TuCine/v1/actors
+    //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/actors
     //Method: POST
     @Transactional
     @PostMapping("/actors")
@@ -33,7 +33,7 @@ public class ActorController {
         return new ResponseEntity<>(actorService.createActor(actorReceiveDto), org.springframework.http.HttpStatus.CREATED);
     }
 
-    //URL : http://localhost:8080/api/TuCine/v1/actors/{actorId}
+    //URL : http://localhost:8080/api/TuCine/v1/cineclub_administration/actors/{actorId}
     //Method:PUT
     @Transactional
     @PutMapping("/actors/{actorId}")
@@ -41,7 +41,7 @@ public class ActorController {
         return new ResponseEntity<>(actorService.modifyActor(actorId, updatedActor), org.springframework.http.HttpStatus.OK);
     }
 
-    //URL: http://localhost:8080/api/TuCine/v1/actors/{actorId}
+    //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/actors/{actorId}
     //Method: DELETE
     @Transactional
     @DeleteMapping("/actors/{actorId}")

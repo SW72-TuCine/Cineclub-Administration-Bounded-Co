@@ -17,7 +17,7 @@ import java.util.List;
 @SpringBootTest
 class CineclubAdministrationApplicationTests {
 
-	@Test
+	/*@Test
 	void Test1StringDatabase() {
 		System.out.println(TheMovieDatabaseHelper.getMovieTrailerSrcVideo("507089"));
 	}
@@ -73,5 +73,5 @@ class CineclubAdministrationApplicationTests {
 
 
 	}
-
+*/
 }

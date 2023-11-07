@@ -16,7 +16,7 @@ public class AwardController {
     @Autowired
     private AwardService awardService;
 
-    //URL: http://localhost:8080/api/TuCine/v1/awards
+    //URL: http://localhost:8080//api/TuCine/v1/cineclub_administration/awards
     //Method: GET
     @Transactional(readOnly = true)
     @GetMapping("/awards")
@@ -24,7 +24,7 @@ public class AwardController {
         return new ResponseEntity<>(awardService.getAllAwards(), org.springframework.http.HttpStatus.OK);
     }
 
-    //URl: http://localhost:8080/api/TuCine/v1/awards
+    //URl: http://localhost:8080//api/TuCine/v1/cineclub_administration/awards
     //Method: POST
     @Transactional
     @PostMapping("/awards")
@@ -32,7 +32,7 @@ public class AwardController {
         return new ResponseEntity<>(awardService.createAward(awardReceiveDto), org.springframework.http.HttpStatus.CREATED);
     }
 
-    //URL: http://localhost:8080/api/TuCine/v1/awards/{awardId}
+    //URL: http://localhost:8080//api/TuCine/v1/cineclub_administration/awards/{awardId}
     //Method: PUT
     @Transactional
     @PutMapping("/awards/{awardId}")
@@ -40,7 +40,7 @@ public class AwardController {
         return new ResponseEntity<>(awardService.modifyAward(awardId, updatedAward), org.springframework.http.HttpStatus.OK);
     }
 
-    //URL: http://localhost:8080/api/TuCine/v1/awards/{awardId}
+    //URL: http://localhost:8080//api/TuCine/v1/cineclub_administration/awards/{awardId}
     //Method: DELETE
     @Transactional
     @DeleteMapping("/awards/{awardId}")
@@ -48,8 +48,6 @@ public class AwardController {
         awardService.deleteAward(awardId);
         return new ResponseEntity<>(org.springframework.http.HttpStatus.NO_CONTENT);
     }
-
-
 
 
 }

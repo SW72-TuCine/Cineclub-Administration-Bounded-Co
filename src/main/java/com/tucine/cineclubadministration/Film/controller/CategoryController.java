@@ -18,7 +18,7 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    //URL: http://localhost:8080/api/TuCine/v1/categories
+    //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/categories
     //Method: GET
     @Transactional(readOnly = true)
     @GetMapping("/categories")
@@ -26,7 +26,7 @@ public class CategoryController {
         return new ResponseEntity<>(categoryService.getAllCategories(), HttpStatus.OK);
     }
 
-    //URL: http://localhost:8080/api/TuCine/v1/categories
+    //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/categories
     //Method: POST
     @Transactional
     @PostMapping("/categories")

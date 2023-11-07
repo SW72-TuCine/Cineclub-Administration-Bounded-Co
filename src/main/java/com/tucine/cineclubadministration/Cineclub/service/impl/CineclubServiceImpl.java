@@ -82,8 +82,6 @@ public class CineclubServiceImpl implements CineclubService {
     }
 
 
-
-
     private void validateUserExistsAndItsBUSINESS(String idClient) {
         try {
             ResponseEntity<UserResponse> userResponse = userClient.getUserById(Long.valueOf(idClient));
