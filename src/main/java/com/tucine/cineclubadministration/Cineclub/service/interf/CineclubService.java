@@ -30,4 +30,5 @@ public interface CineclubService {
 
     List<CineclubDto> getCineclubByName(String cineclubName);
 
+    boolean checkIfCinemaExist(Long cineclubId);
 }

@@ -132,5 +132,15 @@ public class CineclubController {
     }
 
 
+    /*
+    @RequestMapping("/cineclubs/verify/{cineclubName}")
+    boolean checkIfExistCineClub(@PathVariable Long cineclubName){
+        return cineclubService.CheckIfExistCineClub(cineclubName);
+    }
 
+     */
+    @RequestMapping("/cineclubs/verify/{cineclubId}")
+    boolean checkIfCinemaExist(@PathVariable Long cineclubId){
+        return cineclubService.checkIfCinemaExist(cineclubId);
+    }
 }

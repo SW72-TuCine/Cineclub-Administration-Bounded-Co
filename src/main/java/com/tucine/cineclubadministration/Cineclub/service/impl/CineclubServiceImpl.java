@@ -269,8 +269,6 @@ public class CineclubServiceImpl implements CineclubService {
 
     @Override
     public List<CineclubDto> getCineclubByName(String cineclubName) {
-
-
 /*        List<Cineclub> cineclubs = cineclubRepository.getAllByCineclubTypeNameContains(categorie);
 
         // Mapear la lista de Cineclub a una lista de CineclubDto usando stream y map
@@ -288,6 +286,15 @@ public class CineclubServiceImpl implements CineclubService {
 
         return cineclubDtos;
     }
+
+    /*
+    @Override
+    public boolean CheckIfExistCineClub(Long cineclubId) {
+        return cineclubRepository.CheckIfExistCineClub(cineclubId);
+    }
+
+     */
+
 
     private void validateCineclub(CineclubReceiveDto cineclubReceiveDto) {
 
@@ -309,5 +316,10 @@ public class CineclubServiceImpl implements CineclubService {
         if(cineclubRepository.existsByName(name)){
             throw new ValidationException("Ya existe un cineclub con ese nombre");
         }
+    }
+
+    @Override
+    public boolean checkIfCinemaExist(Long userId) {
+        return cineclubRepository.existsById(userId);
     }
 }
