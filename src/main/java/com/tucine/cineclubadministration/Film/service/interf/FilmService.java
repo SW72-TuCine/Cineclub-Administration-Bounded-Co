@@ -48,5 +48,6 @@ public interface FilmService{
     FilmDto getFilmById(Long filmId);
 
     //128c248aa05308b3052afb5d83556f6e API KEY
+    boolean checkIfFilmExist(Long FilmId);
 
 }

@@ -455,6 +455,11 @@ public class FilmServiceImpl implements FilmService {
         return modelMapper.map(film, FilmDto.class);
     }
 
+    @Override
+    public boolean checkIfFilmExist(Long FilmId) {
+        return filmRepository.existsById(FilmId);
+    }
+
     private void validateFilm(FilmReceiveDto filmReceiveDto) {
         if(filmReceiveDto.getTitle() == null || filmReceiveDto.getTitle().isEmpty()){
             throw new ValidationException("El título de la película no puede estar vacío");

@@ -19,5 +19,6 @@ public interface FilmRepository extends JpaRepository<Film, Long> {
     Film findByTitle(String title);
 
     Film findById(long id);
+    boolean existsById(Long id);
 
 }

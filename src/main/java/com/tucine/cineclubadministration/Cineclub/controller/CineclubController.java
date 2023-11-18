@@ -6,8 +6,6 @@ import com.tucine.cineclubadministration.Cineclub.dto.normal.CineclubDto;
 import com.tucine.cineclubadministration.Cineclub.dto.receive.CineclubReceiveDto;
 import com.tucine.cineclubadministration.Cineclub.service.interf.CineclubService;
 import com.tucine.cineclubadministration.Film.dto.normal.FilmDto;
-import com.tucine.cineclubadministration.Film.model.Film;
-import com.tucine.cineclubadministration.shared.exception.ErrorMessage;
 import com.tucine.cineclubadministration.shared.exception.ValidationException;
 import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;

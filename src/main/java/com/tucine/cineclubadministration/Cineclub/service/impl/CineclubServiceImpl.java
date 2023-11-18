@@ -24,6 +24,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,21 +46,22 @@ public class CineclubServiceImpl implements CineclubService {
 
     @Autowired
     private UserClient userClient;
+
     @Override
     public List<CineclubDto> getAllCineclubs() {
         List<Cineclub> cineclubs = cineclubRepository.findAll();
         return cineclubs.stream().map(this::EntityToDto).toList();
     }
 
-    public CineclubDto EntityToDto(Cineclub cineclub){
+    public CineclubDto EntityToDto(Cineclub cineclub) {
         return modelMapper.map(cineclub, CineclubDto.class);
     }
 
-    public Cineclub DtoToEntity(CineclubDto cineclubDto){
+    public Cineclub DtoToEntity(CineclubDto cineclubDto) {
         return modelMapper.map(cineclubDto, Cineclub.class);
     }
 
-    public FilmDto EntityToDto(Film film){
+    public FilmDto EntityToDto(Film film) {
         return modelMapper.map(film, FilmDto.class);
     }
 
@@ -86,7 +88,7 @@ public class CineclubServiceImpl implements CineclubService {
         try {
             ResponseEntity<UserResponse> userResponse = userClient.getUserById(Long.valueOf(idClient));
 
-            if(userResponse.getBody().getTypeUser().getName() != TypeUsers.BUSINESS){
+            if (userResponse.getBody().getTypeUser().getName() != TypeUsers.BUSINESS) {
                 throw new ValidationException("El usuario no es un negocio");
             }
 
@@ -94,6 +96,7 @@ public class CineclubServiceImpl implements CineclubService {
             throw new ValidationException(feignException.getMessage());
         }
     }
+
     @Override
     public CineclubDto modifyCineclub(Long cineclubId, CineclubReceiveDto cineclubReceiveDto) {
         Cineclub existingCineclub = cineclubRepository.findById(cineclubId)
@@ -241,7 +244,7 @@ public class CineclubServiceImpl implements CineclubService {
         Cineclub cineclub = cineclubRepository.findById(cineclubId)
                 .orElseThrow(() -> new ValidationException("No se encontró un cineclub con el ID proporcionado"));
 
-        if(!(cineclub.getState()=="Suspendido"))
+        if (!(cineclub.getState() == "Suspendido"))
             cineclub.setState("Suspendido");
 
         return EntityToDto(cineclubRepository.save(cineclub));
@@ -250,13 +253,13 @@ public class CineclubServiceImpl implements CineclubService {
     @Override
     public CineclubDto hideCineclub(Long cineclubId) {
 
-            Cineclub cineclub = cineclubRepository.findById(cineclubId)
-                    .orElseThrow(() -> new ValidationException("No se encontró un cineclub con el ID proporcionado"));
+        Cineclub cineclub = cineclubRepository.findById(cineclubId)
+                .orElseThrow(() -> new ValidationException("No se encontró un cineclub con el ID proporcionado"));
 
-            if(!(cineclub.getState()=="Oculto"))
-                cineclub.setState("Oculto");
+        if (!(cineclub.getState() == "Oculto"))
+            cineclub.setState("Oculto");
 
-            return EntityToDto(cineclubRepository.save(cineclub));
+        return EntityToDto(cineclubRepository.save(cineclub));
     }
 
     @Override
@@ -278,9 +281,9 @@ public class CineclubServiceImpl implements CineclubService {
 
         return cineclubDtos;*/
 
-        List<Cineclub> cineclubs= cineclubRepository.getAllByNameContains(cineclubName);
+        List<Cineclub> cineclubs = cineclubRepository.getAllByNameContains(cineclubName);
 
-        List<CineclubDto> cineclubDtos =cineclubs.stream()
+        List<CineclubDto> cineclubDtos = cineclubs.stream()
                 .map(this::EntityToDto) // Convierte cada Cineclub a CineclubDto
                 .collect(Collectors.toList()); // Recolecta los resultados en una lista
 
@@ -298,22 +301,22 @@ public class CineclubServiceImpl implements CineclubService {
 
     private void validateCineclub(CineclubReceiveDto cineclubReceiveDto) {
 
-        if(cineclubReceiveDto.getName()==null || cineclubReceiveDto.getName().isEmpty()){
+        if (cineclubReceiveDto.getName() == null || cineclubReceiveDto.getName().isEmpty()) {
             throw new ValidationException("El nombre del cineclub no puede estar vacio");
         }
-        if(cineclubReceiveDto.getCapacity()==null || cineclubReceiveDto.getCapacity()<0){
+        if (cineclubReceiveDto.getCapacity() == null || cineclubReceiveDto.getCapacity() < 0) {
             throw new ValidationException("La capacidad del cineclub no puede ser nula o negativa");
         }
-        if(cineclubReceiveDto.getAddress()==null || cineclubReceiveDto.getAddress().isEmpty()){
+        if (cineclubReceiveDto.getAddress() == null || cineclubReceiveDto.getAddress().isEmpty()) {
             throw new ValidationException("La dirección del cineclub no puede estar vacia");
         }
-        if(cineclubReceiveDto.getOwnerId()==null){
+        if (cineclubReceiveDto.getOwnerId() == null) {
             throw new ValidationException("El id del dueño no puede ser nulo");
         }
 
     }
     private void existCineclubByName(String name) {
-        if(cineclubRepository.existsByName(name)){
+        if (cineclubRepository.existsByName(name)) {
             throw new ValidationException("Ya existe un cineclub con ese nombre");
         }
     }

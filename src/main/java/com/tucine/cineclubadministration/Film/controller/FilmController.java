@@ -172,6 +172,9 @@ public class FilmController {
     }
 
 
-
+    @RequestMapping("/films/verify/{filmId}")
+    boolean checkIfFilmExist(@PathVariable Long cineclubId){
+        return filmService.checkIfFilmExist(cineclubId);
+    }
 
 }
