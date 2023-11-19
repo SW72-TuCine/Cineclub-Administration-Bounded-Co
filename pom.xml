@@ -10,6 +10,7 @@
 	</parent>
 
 	<groupId>com.tucine</groupId>
+
 	<artifactId>cineclub-administration</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Cineclub Administration</name>

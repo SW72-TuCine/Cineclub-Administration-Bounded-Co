@@ -69,8 +69,8 @@ public class CineclubController {
     //URL: http://localhost:8080/api/TuCine/v1/cineclub_administration/cineclubs/{cineclubId}
     //Method: GET
     @Transactional(readOnly = true)
-    @GetMapping("/cineclubs/{cineclubId}")
-    public ResponseEntity<CineclubDto> getCineclubById(Long cineclubId){
+    @GetMapping("/cineclubs/getById/{cineclubId}")
+    public ResponseEntity<CineclubDto> getCineclubById(@PathVariable Long cineclubId){
         return new ResponseEntity<>(cineclubService.getCineclubById(cineclubId), org.springframework.http.HttpStatus.OK);
     }
 
